@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Configuration - Gammes de prix{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+    <div class="max-w-2xl w-full">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-layer-group text-white text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800">Gammes de prix</h2>
+            <p class="text-gray-500 mt-2">Étape 4 sur 5 - Configuration des gammes</p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow p-8">
+            <form method="POST" class="space-y-6">
+                <p class="text-gray-600 mb-4">
+                    Les gammes de prix permettent d'appliquer automatiquement un coefficient 
+                    aux prix de la bibliothèque selon le niveau de finition souhaité.
+                </p>
+                
+                <div class="space-y-4">
+                    {% for tier in tiers %}
+                    <div class="p-4 border rounded-lg">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <label class="flex items-center">
+                                    <input type="radio" name="default_tier" value="{{ tier.id }}" 
+                                           {% if tier.is_default %}checked{% endif %}
+                                           class="text-primary focus:ring-primary">
+                                    <span class="ml-2 font-semibold text-gray-800">{{ tier.name }}</span>
+                                </label>
+                            </div>
+                            <span class="text-sm text-gray-500">{{ tier.code }}</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Coefficient</label>
+                                <input type="number" name="coefficient_{{ tier.id }}" step="0.01" 
+                                       value="{{ tier.coefficient|float }}" min="0.1" max="5"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Arrondi (décimales)</label>
+                                <select name="rounding_{{ tier.id }}" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="0" {% if tier.rounding == 0 %}selected{% endif %}>0</option>
+                                    <option value="1" {% if tier.rounding == 1 %}selected{% endif %}>1</option>
+                                    <option value="2" {% if tier.rounding == 2 %}selected{% endif %}>2</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p class="text-sm text-blue-800">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        <strong>Exemple:</strong> Un article à 100 DH avec un coefficient de 1.25 (Premium) 
+                        sera facturé 125 DH.
+                    </p>
+                </div>
+                
+                <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-secondary transition">
+                    Continuer <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-xl shadow p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Total projets</p>
+                    <p class="text-3xl font-bold text-gray-800">{{ total_projects }}</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-project-diagram text-primary text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Projets actifs</p>
+                    <p class="text-3xl font-bold text-gray-800">{{ active_projects }}</p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-spinner text-green-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Total devis</p>
+                    <p class="text-3xl font-bold text-gray-800">{{ total_quotes }}</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-file-invoice-dollar text-purple-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Actions rapides</p>
+                </div>
+            </div>
+            <a href="{{ url_for('projects.new') }}" class="mt-4 w-full bg-primary text-white py-2 rounded-lg font-medium hover:bg-secondary transition flex items-center justify-center">
+                <i class="fas fa-plus mr-2"></i> Nouveau projet
+            </a>
+        </div>
+    </div>
+    
+    <div class="grid lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl shadow">
+            <div class="p-6 border-b flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-800">Projets récents</h2>
+                <a href="{{ url_for('projects.index') }}" class="text-primary text-sm hover:underline">Voir tout</a>
+            </div>
+            <div class="p-6">
+                {% if recent_projects %}
+                <div class="space-y-4">
+                    {% for project in recent_projects %}
+                    <a href="{{ url_for('projects.view', project_id=project.id) }}" class="block p-4 border rounded-lg hover:border-primary transition">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-gray-800">{{ project.name }}</p>
+                                <p class="text-sm text-gray-500">{{ project.reference }} • {{ project.project_type.value|capitalize }}</p>
+                            </div>
+                            <span class="px-3 py-1 text-xs rounded-full 
+                                {% if project.status.value == 'draft' %}bg-gray-100 text-gray-600
+                                {% elif project.status.value == 'in_progress' %}bg-blue-100 text-blue-600
+                                {% elif project.status.value == 'quote_ready' %}bg-green-100 text-green-600
+                                {% else %}bg-gray-100 text-gray-600{% endif %}">
+                                {{ project.status.value|replace('_', ' ')|capitalize }}
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-folder-open text-4xl mb-4 text-gray-300"></i>
+                    <p>Aucun projet pour le moment</p>
+                    <a href="{{ url_for('projects.new') }}" class="text-primary hover:underline">Créer votre premier projet</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow">
+            <div class="p-6 border-b flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-800">Devis récents</h2>
+                <a href="{{ url_for('quotes.index') }}" class="text-primary text-sm hover:underline">Voir tout</a>
+            </div>
+            <div class="p-6">
+                {% if recent_quotes %}
+                <div class="space-y-4">
+                    {% for quote in recent_quotes %}
+                    <a href="{{ url_for('quotes.view', quote_id=quote.id) }}" class="block p-4 border rounded-lg hover:border-primary transition">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-gray-800">{{ quote.reference }}</p>
+                                <p class="text-sm text-gray-500">{{ quote.project.name }} • V{{ quote.current_version }}</p>
+                            </div>
+                            <span class="px-3 py-1 text-xs rounded-full 
+                                {% if quote.status.value == 'draft' %}bg-gray-100 text-gray-600
+                                {% elif quote.status.value == 'sent' %}bg-blue-100 text-blue-600
+                                {% elif quote.status.value == 'accepted' %}bg-green-100 text-green-600
+                                {% elif quote.status.value == 'rejected' %}bg-red-100 text-red-600
+                                {% else %}bg-gray-100 text-gray-600{% endif %}">
+                                {{ quote.status.value|capitalize }}
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-file-invoice text-4xl mb-4 text-gray-300"></i>
+                    <p>Aucun devis pour le moment</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

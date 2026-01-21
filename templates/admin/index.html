@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Utilisateurs{% endblock %}
+{% block page_title %}Gestion des utilisateurs{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-end">
+        <a href="{{ url_for('admin.new_user') }}" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition">
+            <i class="fas fa-user-plus mr-2"></i> Nouvel utilisateur
+        </a>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Utilisateur</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rôles</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dernière connexion</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for user in users %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-medium">
+                                    {{ user.first_name[0] if user.first_name else user.email[0]|upper }}
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900">{{ user.full_name }}</p>
+                                    <p class="text-sm text-gray-500">{{ user.email }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-wrap gap-1">
+                                {% for role in user.get_role_names() %}
+                                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">{{ role|capitalize }}</span>
+                                {% endfor %}
+                                {% if user.is_company_owner %}
+                                <span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-700">Propriétaire</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if user.is_active %}
+                            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">Actif</span>
+                            {% else %}
+                            <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700">Inactif</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500">
+                            {{ user.last_login.strftime('%d/%m/%Y %H:%M') if user.last_login else 'Jamais' }}
+                        </td>
+                        <td class="px-6 py-4 text-right space-x-2">
+                            <a href="{{ url_for('admin.edit_user', user_id=user.id) }}" class="text-primary hover:text-secondary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            {% if not user.is_company_owner %}
+                            <form method="POST" action="{{ url_for('admin.toggle_user', user_id=user.id) }}" class="inline">
+                                <button type="submit" class="{% if user.is_active %}text-red-500 hover:text-red-700{% else %}text-green-500 hover:text-green-700{% endif %}">
+                                    <i class="fas {% if user.is_active %}fa-ban{% else %}fa-check-circle{% endif %}"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

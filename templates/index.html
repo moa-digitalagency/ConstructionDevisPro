@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900">
+    <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+            <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                <i class="fas fa-building text-primary"></i>
+            </div>
+            <span class="text-2xl font-bold text-white">DevisPro</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <a href="{{ url_for('auth.login') }}" class="text-white hover:text-blue-200 transition">Connexion</a>
+            <a href="{{ url_for('auth.register') }}" class="bg-white text-primary px-6 py-2 rounded-lg font-medium hover:bg-blue-50 transition">
+                Créer un compte
+            </a>
+        </div>
+    </nav>
+    
+    <div class="container mx-auto px-6 py-20">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">
+                Créez vos devis de construction en quelques clics
+            </h1>
+            <p class="text-xl text-blue-200 mb-10">
+                Importez vos plans, générez automatiquement les métrés et produisez des devis professionnels. 
+                Solution SaaS multi-entreprises pour les professionnels du bâtiment.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{{ url_for('auth.register') }}" class="bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition shadow-lg">
+                    <i class="fas fa-rocket mr-2"></i>
+                    Commencer gratuitement
+                </a>
+                <a href="#features" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-primary transition">
+                    <i class="fas fa-play-circle mr-2"></i>
+                    Voir la démo
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div id="features" class="bg-white py-20">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">
+                Tout ce dont vous avez besoin pour vos devis
+            </h2>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="p-6 bg-gray-50 rounded-xl">
+                    <div class="w-14 h-14 bg-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-file-pdf text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Import de plans</h3>
+                    <p class="text-gray-600">
+                        Importez vos plans PDF ou DWG/DXF. Calibrez l'échelle et tracez les surfaces pour calculer automatiquement les métrés.
+                    </p>
+                </div>
+                
+                <div class="p-6 bg-gray-50 rounded-xl">
+                    <div class="w-14 h-14 bg-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-database text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Bibliothèque BPU</h3>
+                    <p class="text-gray-600">
+                        Bibliothèque de prix par pays, personnalisable. Gérez vos gammes de prix (Éco, Standard, Premium) avec coefficients.
+                    </p>
+                </div>
+                
+                <div class="p-6 bg-gray-50 rounded-xl">
+                    <div class="w-14 h-14 bg-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-file-invoice-dollar text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Devis professionnels</h3>
+                    <p class="text-gray-600">
+                        Générez des devis versionnés avec exports PDF et Excel. Calcul automatique des totaux HT/TVA/TTC.
+                    </p>
+                </div>
+                
+                <div class="p-6 bg-gray-50 rounded-xl">
+                    <div class="w-14 h-14 bg-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-question-circle text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Moteur de questions</h3>
+                    <p class="text-gray-600">
+                        Collectez les informations manquantes: hauteur sous plafond, menuiseries, revêtements, climatisation, piscine...
+                    </p>
+                </div>
+                
+                <div class="p-6 bg-gray-50 rounded-xl">
+                    <div class="w-14 h-14 bg-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-users text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Multi-utilisateurs</h3>
+                    <p class="text-gray-600">
+                        Gérez votre équipe avec des rôles: Admin, Métreur, Commercial, Lecture seule. Permissions granulaires.
+                    </p>
+                </div>
+                
+                <div class="p-6 bg-gray-50 rounded-xl">
+                    <div class="w-14 h-14 bg-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-globe text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Multi-pays</h3>
+                    <p class="text-gray-600">
+                        Support multi-devises et bibliothèques BPU par pays: Maroc, France, Tunisie, Algérie, Sénégal, Côte d'Ivoire.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-gray-100 py-20">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">
+                Prêt à simplifier vos devis ?
+            </h2>
+            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                Rejoignez des centaines de professionnels qui utilisent DevisPro pour gagner du temps et produire des devis précis.
+            </p>
+            <a href="{{ url_for('auth.register') }}" class="bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-secondary transition shadow-lg inline-block">
+                Créer mon compte gratuitement
+            </a>
+        </div>
+    </div>
+    
+    <footer class="bg-gray-800 text-gray-400 py-10">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <div class="w-8 h-8 bg-white rounded flex items-center justify-center">
+                        <i class="fas fa-building text-primary text-sm"></i>
+                    </div>
+                    <span class="text-white font-semibold">DevisPro</span>
+                </div>
+                <p class="text-sm">© 2025 DevisPro. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Articles personnalisés{% endblock %}
+{% block page_title %}Articles personnalisés{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <a href="{{ url_for('bpu.index') }}" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-arrow-left mr-2"></i> Retour à la bibliothèque
+        </a>
+        <a href="{{ url_for('bpu.new_custom_article') }}" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition">
+            <i class="fas fa-plus mr-2"></i> Nouvel article
+        </a>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+        {% if articles %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Catégorie</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Désignation</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Unité</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Éco</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Standard</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Premium</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for article in articles %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm font-mono text-gray-600">{{ article.code }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-500">{{ article.category }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-800">{{ article.designation }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-500 text-center">{{ article.unit }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600 text-right">{{ "{:,.2f}".format(article.unit_price_eco|float) if article.unit_price_eco else '-' }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600 text-right">{{ "{:,.2f}".format(article.unit_price_standard|float) if article.unit_price_standard else '-' }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600 text-right">{{ "{:,.2f}".format(article.unit_price_premium|float) if article.unit_price_premium else '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-cube text-5xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500 mb-4">Aucun article personnalisé</p>
+            <a href="{{ url_for('bpu.new_custom_article') }}" class="text-primary hover:underline">Créer votre premier article</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

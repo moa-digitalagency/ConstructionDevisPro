@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Configuration - Pays{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+    <div class="max-w-lg w-full">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-building text-white text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800">Configuration de votre espace</h2>
+            <p class="text-gray-500 mt-2">Étape 1 sur 5 - Sélection du pays</p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow p-8">
+            <form method="POST" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pays principal d'activité</label>
+                    <div class="space-y-2">
+                        {% for code, info in countries.items() %}
+                        <label class="flex items-center p-4 border rounded-lg hover:border-primary cursor-pointer transition">
+                            <input type="radio" name="country" value="{{ code }}" 
+                                   {% if current_country == code %}checked{% endif %}
+                                   class="text-primary focus:ring-primary">
+                            <span class="ml-3">
+                                <span class="font-medium text-gray-800">{{ info.name }}</span>
+                                <span class="text-sm text-gray-500 ml-2">({{ info.currency }})</span>
+                            </span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-secondary transition">
+                    Continuer <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

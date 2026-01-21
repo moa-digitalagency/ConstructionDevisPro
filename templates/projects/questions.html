@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% block title %}Questionnaire - {{ project.name }}{% endblock %}
+{% block page_title %}Questionnaire projet{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <a href="{{ url_for('projects.view', project_id=project.id) }}" class="text-gray-500 hover:text-gray-700">
+        <i class="fas fa-arrow-left mr-2"></i> Retour au projet
+    </a>
+    
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white rounded-xl shadow p-8">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-800">Informations complémentaires</h2>
+                <p class="text-gray-500 mt-2">Répondez aux questions pour affiner le chiffrage</p>
+            </div>
+            
+            <form method="POST" action="{{ url_for('api.save_project_answers', project_id=project.id) if false else '#' }}" class="space-y-8" id="questions-form">
+                <div class="border rounded-lg p-6">
+                    <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-ruler-vertical text-primary mr-2"></i>
+                        Dimensions générales
+                    </h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Hauteur sous plafond</label>
+                            <select name="ceiling_height" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="2.60">2.60 m</option>
+                                <option value="2.80" selected>2.80 m (standard)</option>
+                                <option value="3.00">3.00 m</option>
+                                <option value="3.20">3.20 m</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border rounded-lg p-6">
+                    <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-door-open text-primary mr-2"></i>
+                        Menuiseries
+                    </h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Type de fenêtres</label>
+                            <select name="window_type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="aluminium" selected>Aluminium</option>
+                                <option value="pvc">PVC</option>
+                                <option value="bois">Bois</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Type de vitrage</label>
+                            <select name="glazing_type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="simple">Simple vitrage</option>
+                                <option value="double" selected>Double vitrage</option>
+                                <option value="triple">Triple vitrage</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border rounded-lg p-6">
+                    <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-th-large text-primary mr-2"></i>
+                        Revêtements
+                    </h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Revêtement de sol principal</label>
+                            <select name="floor_type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="carrelage" selected>Carrelage grès cérame</option>
+                                <option value="marbre">Carrelage marbre</option>
+                                <option value="parquet">Parquet</option>
+                                <option value="beton_cire">Béton ciré</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Revêtement mural SDB</label>
+                            <select name="bathroom_wall" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="faience" selected>Faïence standard</option>
+                                <option value="faience_grand">Faïence grand format</option>
+                                <option value="marbre">Marbre</option>
+                                <option value="tadelakt">Tadelakt</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border rounded-lg p-6">
+                    <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-snowflake text-primary mr-2"></i>
+                        Climatisation / Chauffage
+                    </h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Système de climatisation</label>
+                            <select name="clim" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" onchange="toggleClimQty(this)">
+                                <option value="aucune">Aucune</option>
+                                <option value="split" selected>Splits muraux</option>
+                                <option value="gainable">Gainable</option>
+                            </select>
+                        </div>
+                        <div id="clim-qty-container">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre d'unités</label>
+                            <input type="number" name="clim_qty" value="4" min="1"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+                
+                {% if project.project_type.value in ['renovation', 'extension'] %}
+                <div class="border rounded-lg p-6">
+                    <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-hammer text-primary mr-2"></i>
+                        Démolition
+                    </h3>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Travaux de démolition ?</label>
+                        <select name="demolition" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="non" selected>Non</option>
+                            <option value="oui_facile">Oui - Accès facile</option>
+                            <option value="oui_difficile">Oui - Accès difficile</option>
+                        </select>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="border rounded-lg p-6">
+                    <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-swimming-pool text-primary mr-2"></i>
+                        Piscine
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Le projet inclut-il une piscine ?</label>
+                            <select name="piscine" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" onchange="togglePoolOptions(this)">
+                                <option value="non" selected>Non</option>
+                                <option value="oui">Oui</option>
+                            </select>
+                        </div>
+                        
+                        <div id="pool-options" class="hidden grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Longueur (m)</label>
+                                <input type="number" name="pool_length" value="8" step="0.5" min="3"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Largeur (m)</label>
+                                <input type="number" name="pool_width" value="4" step="0.5" min="2"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Système de filtration</label>
+                                <select name="pool_system" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="sable" selected>Filtration à sable</option>
+                                    <option value="cartouche">Filtration à cartouche</option>
+                                    <option value="sel">Électrolyse au sel</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between pt-4">
+                    <a href="{{ url_for('projects.view', project_id=project.id) }}" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                        Annuler
+                    </a>
+                    <button type="submit" class="px-8 py-3 bg-primary text-white rounded-lg font-medium hover:bg-secondary transition">
+                        <i class="fas fa-save mr-2"></i>
+                        Enregistrer les réponses
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleClimQty(select) {
+    const container = document.getElementById('clim-qty-container');
+    container.style.display = select.value === 'aucune' ? 'none' : 'block';
+}
+
+function togglePoolOptions(select) {
+    const container = document.getElementById('pool-options');
+    container.classList.toggle('hidden', select.value === 'non');
+}
+
+document.getElementById('questions-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('Réponses enregistrées! Vous pouvez maintenant générer un devis.');
+    window.location.href = '{{ url_for("projects.view", project_id=project.id) }}';
+});
+</script>
+{% endblock %}

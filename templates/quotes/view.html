@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}{{ quote.reference }}{% endblock %}
+{% block page_title %}Devis {{ quote.reference }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-wrap items-center gap-4">
+        <a href="{{ url_for('quotes.index') }}" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-arrow-left mr-2"></i> Retour
+        </a>
+        <span class="px-3 py-1 text-sm rounded-full 
+            {% if quote.status.value == 'draft' %}bg-gray-100 text-gray-600
+            {% elif quote.status.value == 'sent' %}bg-blue-100 text-blue-600
+            {% elif quote.status.value == 'accepted' %}bg-green-100 text-green-600
+            {% elif quote.status.value == 'rejected' %}bg-red-100 text-red-600
+            {% else %}bg-gray-100 text-gray-600{% endif %}">
+            {{ quote.status.value|capitalize }}
+        </span>
+        <span class="text-gray-500">Version {{ quote.current_version }}</span>
+    </div>
+    
+    <div class="grid lg:grid-cols-4 gap-6">
+        <div class="lg:col-span-3 space-y-6">
+            <div class="bg-white rounded-xl shadow p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-800">Détail du devis</h2>
+                    <div class="flex items-center space-x-2">
+                        <a href="{{ url_for('quotes.edit', quote_id=quote.id) }}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition">
+                            <i class="fas fa-edit mr-1"></i> Modifier
+                        </a>
+                    </div>
+                </div>
+                
+                {% if current_version and current_version.lines.count() > 0 %}
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Désignation</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Unité</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Qté</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">P.U. HT</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total HT</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {% set current_category = namespace(value='') %}
+                            {% for line in current_version.lines.order_by('sort_order') %}
+                            {% if line.category != current_category.value %}
+                            {% set current_category.value = line.category %}
+                            <tr class="bg-gray-50">
+                                <td colspan="5" class="px-4 py-2 font-semibold text-gray-800">
+                                    {{ line.category }}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td class="px-4 py-3 text-sm text-gray-800">{{ line.designation }}</td>
+                                <td class="px-4 py-3 text-sm text-gray-500 text-center">{{ line.unit }}</td>
+                                <td class="px-4 py-3 text-sm text-gray-800 text-right">{{ "%.2f"|format(line.quantity|float) }}</td>
+                                <td class="px-4 py-3 text-sm text-gray-800 text-right">{{ "{:,.2f}".format(line.unit_price|float) }}</td>
+                                <td class="px-4 py-3 text-sm font-medium text-gray-900 text-right">{{ "{:,.2f}".format(line.total_price|float) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-6 pt-6 border-t">
+                    <div class="flex justify-end">
+                        <div class="w-64 space-y-2">
+                            <div class="flex justify-between text-gray-600">
+                                <span>Total HT</span>
+                                <span>{{ "{:,.2f}".format(current_version.subtotal_ht|float) }} {{ current_user.company.currency }}</span>
+                            </div>
+                            <div class="flex justify-between text-gray-600">
+                                <span>TVA ({{ current_version.vat_rate|float }}%)</span>
+                                <span>{{ "{:,.2f}".format(current_version.vat_amount|float) }} {{ current_user.company.currency }}</span>
+                            </div>
+                            <div class="flex justify-between text-lg font-bold text-gray-800 pt-2 border-t">
+                                <span>Total TTC</span>
+                                <span>{{ "{:,.2f}".format(current_version.total_ttc|float) }} {{ current_user.company.currency }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-file-alt text-4xl text-gray-300 mb-4"></i>
+                    <p>Aucune ligne dans ce devis</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if current_version and current_version.assumptions.count() > 0 %}
+            <div class="bg-white rounded-xl shadow p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Hypothèses</h2>
+                <div class="space-y-2">
+                    {% for assumption in current_version.assumptions %}
+                    <div class="flex items-center justify-between py-2 border-b last:border-0">
+                        <span class="text-gray-700">{{ assumption.description }}</span>
+                        <span class="font-medium text-gray-900">{{ assumption.value }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="space-y-6">
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="font-semibold text-gray-800 mb-4">Informations</h3>
+                <div class="space-y-3 text-sm">
+                    <div>
+                        <p class="text-gray-500">Projet</p>
+                        <a href="{{ url_for('projects.view', project_id=quote.project.id) }}" class="font-medium text-primary hover:underline">
+                            {{ quote.project.name }}
+                        </a>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Client</p>
+                        <p class="font-medium">{{ quote.project.client_name or '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Gamme</p>
+                        <p class="font-medium">{{ current_version.tier.name if current_version and current_version.tier else 'Standard' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Valide jusqu'au</p>
+                        <p class="font-medium">{{ quote.valid_until.strftime('%d/%m/%Y') if quote.valid_until else '-' }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="font-semibold text-gray-800 mb-4">Actions</h3>
+                <div class="space-y-3">
+                    <a href="{{ url_for('quotes.export_pdf', quote_id=quote.id) }}" class="w-full bg-red-600 text-white py-2 rounded-lg font-medium hover:bg-red-700 transition flex items-center justify-center">
+                        <i class="fas fa-file-pdf mr-2"></i> Télécharger PDF
+                    </a>
+                    <a href="{{ url_for('quotes.export_excel', quote_id=quote.id) }}" class="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 transition flex items-center justify-center">
+                        <i class="fas fa-file-excel mr-2"></i> Télécharger Excel
+                    </a>
+                    <a href="{{ url_for('quotes.edit', quote_id=quote.id) }}" class="w-full border border-gray-300 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-50 transition flex items-center justify-center">
+                        <i class="fas fa-edit mr-2"></i> Modifier
+                    </a>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="font-semibold text-gray-800 mb-4">Statut</h3>
+                <form method="POST" action="{{ url_for('quotes.update_status', quote_id=quote.id) }}">
+                    <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent mb-3">
+                        {% for status in ['draft', 'pending', 'sent', 'accepted', 'rejected'] %}
+                        <option value="{{ status }}" {% if quote.status.value == status %}selected{% endif %}>
+                            {{ status|capitalize }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg font-medium hover:bg-secondary transition">
+                        Mettre à jour
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

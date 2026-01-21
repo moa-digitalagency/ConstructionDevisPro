@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Configuration - Identité visuelle{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+    <div class="max-w-2xl w-full">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-palette text-white text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800">Identité visuelle</h2>
+            <p class="text-gray-500 mt-2">Étape 5 sur 5 - Personnalisation des devis</p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow p-8">
+            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Logo de l'entreprise</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition cursor-pointer" onclick="document.getElementById('logo').click()">
+                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-600">Cliquez pour télécharger votre logo</p>
+                        <p class="text-sm text-gray-400">PNG, JPG (max 2 Mo)</p>
+                        <input type="file" id="logo" name="logo" accept="image/*" class="hidden">
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Raison sociale</label>
+                        <input type="text" name="legal_name" value="{{ branding.legal_name or '' }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                               placeholder="Ma Société SARL">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">N° IF</label>
+                        <input type="text" name="tax_id" value="{{ branding.tax_id or '' }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
+                    <textarea name="address" rows="2"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                              placeholder="123 Rue Mohammed V, Casablanca 20000">{{ branding.address or '' }}</textarea>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                        <input type="tel" name="phone" value="{{ branding.phone or '' }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                               placeholder="+212 5 22 00 00 00">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" name="email" value="{{ branding.email or '' }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                               placeholder="contact@masociete.ma">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Coordonnées bancaires</label>
+                    <textarea name="bank_details" rows="2"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                              placeholder="IBAN: MA... / Banque: ...">{{ branding.bank_details or '' }}</textarea>
+                </div>
+                
+                <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-secondary transition">
+                    Continuer <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

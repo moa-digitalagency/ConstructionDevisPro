@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Devis{% endblock %}
+{% block page_title %}Devis{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <form method="GET" class="flex items-center space-x-2">
+            <select name="status" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent">
+                <option value="">Tous les statuts</option>
+                {% for status in quote_statuses %}
+                <option value="{{ status.value }}" {% if current_status == status.value %}selected{% endif %}>
+                    {{ status.value|capitalize }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                <i class="fas fa-filter"></i>
+            </button>
+        </form>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+        {% if quotes %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Référence</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Projet</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Version</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modifié</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for quote in quotes %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {{ quote.reference }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <p class="text-sm font-medium text-gray-900">{{ quote.project.name }}</p>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ quote.project.client_name or '-' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            V{{ quote.current_version }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-3 py-1 text-xs rounded-full 
+                                {% if quote.status.value == 'draft' %}bg-gray-100 text-gray-600
+                                {% elif quote.status.value == 'sent' %}bg-blue-100 text-blue-600
+                                {% elif quote.status.value == 'accepted' %}bg-green-100 text-green-600
+                                {% elif quote.status.value == 'rejected' %}bg-red-100 text-red-600
+                                {% else %}bg-gray-100 text-gray-600{% endif %}">
+                                {{ quote.status.value|capitalize }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ quote.updated_at.strftime('%d/%m/%Y') }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
+                            <a href="{{ url_for('quotes.view', quote_id=quote.id) }}" class="text-primary hover:text-secondary" title="Voir">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ url_for('quotes.export_pdf', quote_id=quote.id) }}" class="text-red-500 hover:text-red-700" title="PDF">
+                                <i class="fas fa-file-pdf"></i>
+                            </a>
+                            <a href="{{ url_for('quotes.export_excel', quote_id=quote.id) }}" class="text-green-500 hover:text-green-700" title="Excel">
+                                <i class="fas fa-file-excel"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-file-invoice-dollar text-5xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500 mb-4">Aucun devis trouvé</p>
+            <p class="text-sm text-gray-400">Créez un devis depuis un projet</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% block title %}Métrés - {{ plan.name }}{% endblock %}
+{% block page_title %}Métrés - {{ plan.name }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <a href="{{ url_for('projects.view', project_id=project.id) }}" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-arrow-left mr-2"></i> Retour au projet
+        </a>
+        <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-500">Échelle: {{ "%.4f"|format(plan.scale_factor|float) if plan.scale_factor else '-' }} m/px</span>
+        </div>
+    </div>
+    
+    <div class="grid lg:grid-cols-4 gap-6">
+        <div class="lg:col-span-3">
+            <div class="bg-white rounded-xl shadow p-6">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-gray-800">{{ plan.name }}</h2>
+                    <div class="flex items-center space-x-2">
+                        <button id="tool-polygon" class="px-4 py-2 bg-primary text-white rounded-lg text-sm">
+                            <i class="fas fa-draw-polygon mr-1"></i> Polygone
+                        </button>
+                        <button id="tool-line" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">
+                            <i class="fas fa-ruler mr-1"></i> Ligne
+                        </button>
+                        <button id="btn-clear" class="px-4 py-2 border border-red-300 text-red-600 rounded-lg text-sm hover:bg-red-50">
+                            <i class="fas fa-trash mr-1"></i> Effacer
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="canvas-container" class="border rounded-lg overflow-hidden bg-gray-100 relative" style="height: 600px;">
+                    <canvas id="pdf-canvas" class="absolute top-0 left-0"></canvas>
+                    <canvas id="draw-canvas" class="absolute top-0 left-0 cursor-crosshair"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="space-y-6">
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="font-semibold text-gray-800 mb-4">Nouvelle pièce</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                        <input type="text" id="room_name"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                               placeholder="Salon, Chambre 1...">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                        <select id="room_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="salon">Salon</option>
+                            <option value="chambre">Chambre</option>
+                            <option value="cuisine">Cuisine</option>
+                            <option value="sdb">Salle de bain</option>
+                            <option value="wc">WC</option>
+                            <option value="couloir">Couloir</option>
+                            <option value="bureau">Bureau</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Surface calculée</label>
+                        <div id="calculated_area" class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-lg font-semibold text-primary">
+                            - m²
+                        </div>
+                    </div>
+                    
+                    <button id="btn-save-room" disabled
+                            class="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed">
+                        <i class="fas fa-save mr-2"></i>
+                        Enregistrer la pièce
+                    </button>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="font-semibold text-gray-800 mb-4">Pièces définies</h3>
+                
+                <div id="rooms-list" class="space-y-2 max-h-60 overflow-y-auto">
+                    {% for room in project.rooms %}
+                    <div class="p-3 border rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium text-gray-800">{{ room.name }}</span>
+                            <span class="text-sm text-primary">{{ room.area|round(2) if room.area else '-' }} m²</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-gray-500 text-sm">Aucune pièce définie</p>
+                    {% endfor %}
+                </div>
+                
+                <div class="mt-4 pt-4 border-t">
+                    <div class="flex items-center justify-between text-lg font-semibold">
+                        <span>Total</span>
+                        <span class="text-primary" id="total-area">
+                            {{ project.rooms.all()|sum(attribute='area')|round(2) if project.rooms.count() > 0 else 0 }} m²
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const pdfCanvas = document.getElementById('pdf-canvas');
+const drawCanvas = document.getElementById('draw-canvas');
+const pdfCtx = pdfCanvas.getContext('2d');
+const drawCtx = drawCanvas.getContext('2d');
+
+const scaleFactor = {{ plan.scale_factor or 1 }};
+let points = [];
+let currentTool = 'polygon';
+
+{% if plan.file_type == 'pdf' %}
+const loadingTask = pdfjsLib.getDocument('/{{ plan.file_path }}');
+loadingTask.promise.then(function(pdf) {
+    pdf.getPage(1).then(function(page) {
+        const container = document.getElementById('canvas-container');
+        const scale = container.clientWidth / page.getViewport({scale: 1}).width;
+        const viewport = page.getViewport({scale: scale});
+        
+        pdfCanvas.height = viewport.height;
+        pdfCanvas.width = viewport.width;
+        drawCanvas.height = viewport.height;
+        drawCanvas.width = viewport.width;
+        
+        page.render({
+            canvasContext: pdfCtx,
+            viewport: viewport
+        });
+    });
+});
+{% endif %}
+
+drawCanvas.addEventListener('click', function(e) {
+    const rect = drawCanvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    points.push({x: x, y: y});
+    drawPoint(x, y);
+    
+    if (points.length > 1) {
+        drawLine(points[points.length - 2], points[points.length - 1]);
+    }
+    
+    if (points.length >= 3) {
+        calculateArea();
+    }
+});
+
+drawCanvas.addEventListener('dblclick', function(e) {
+    if (points.length >= 3) {
+        drawLine(points[points.length - 1], points[0]);
+        fillPolygon();
+    }
+});
+
+function drawPoint(x, y) {
+    drawCtx.beginPath();
+    drawCtx.arc(x, y, 4, 0, 2 * Math.PI);
+    drawCtx.fillStyle = '#1a56db';
+    drawCtx.fill();
+}
+
+function drawLine(p1, p2) {
+    drawCtx.beginPath();
+    drawCtx.moveTo(p1.x, p1.y);
+    drawCtx.lineTo(p2.x, p2.y);
+    drawCtx.strokeStyle = '#1a56db';
+    drawCtx.lineWidth = 2;
+    drawCtx.stroke();
+}
+
+function fillPolygon() {
+    drawCtx.beginPath();
+    drawCtx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+        drawCtx.lineTo(points[i].x, points[i].y);
+    }
+    drawCtx.closePath();
+    drawCtx.fillStyle = 'rgba(26, 86, 219, 0.2)';
+    drawCtx.fill();
+    
+    document.getElementById('btn-save-room').disabled = false;
+}
+
+function calculateArea() {
+    let area = 0;
+    const n = points.length;
+    
+    for (let i = 0; i < n; i++) {
+        const j = (i + 1) % n;
+        area += points[i].x * points[j].y;
+        area -= points[j].x * points[i].y;
+    }
+    
+    area = Math.abs(area) / 2;
+    const realArea = area * Math.pow(scaleFactor, 2);
+    
+    document.getElementById('calculated_area').textContent = realArea.toFixed(2) + ' m²';
+}
+
+document.getElementById('btn-clear').addEventListener('click', function() {
+    points = [];
+    drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+    document.getElementById('calculated_area').textContent = '- m²';
+    document.getElementById('btn-save-room').disabled = true;
+});
+
+document.getElementById('btn-save-room').addEventListener('click', function() {
+    const name = document.getElementById('room_name').value || 'Pièce';
+    const type = document.getElementById('room_type').value;
+    
+    let area = 0;
+    const n = points.length;
+    for (let i = 0; i < n; i++) {
+        const j = (i + 1) % n;
+        area += points[i].x * points[j].y;
+        area -= points[j].x * points[i].y;
+    }
+    area = Math.abs(area) / 2 * Math.pow(scaleFactor, 2);
+    
+    let perimeter = 0;
+    for (let i = 0; i < n; i++) {
+        const j = (i + 1) % n;
+        const dx = points[j].x - points[i].x;
+        const dy = points[j].y - points[i].y;
+        perimeter += Math.sqrt(dx*dx + dy*dy);
+    }
+    perimeter *= scaleFactor;
+    
+    fetch('/api/projects/{{ project.id }}/rooms', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            plan_id: {{ plan.id }},
+            name: name,
+            room_type: type,
+            area: area,
+            perimeter: perimeter,
+            polygon_data: points
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id) {
+            location.reload();
+        }
+    });
+});
+
+document.getElementById('tool-polygon').addEventListener('click', function() {
+    currentTool = 'polygon';
+    this.classList.add('bg-primary', 'text-white');
+    this.classList.remove('border', 'border-gray-300');
+    document.getElementById('tool-line').classList.remove('bg-primary', 'text-white');
+    document.getElementById('tool-line').classList.add('border', 'border-gray-300');
+});
+
+document.getElementById('tool-line').addEventListener('click', function() {
+    currentTool = 'line';
+    this.classList.add('bg-primary', 'text-white');
+    this.classList.remove('border', 'border-gray-300');
+    document.getElementById('tool-polygon').classList.remove('bg-primary', 'text-white');
+    document.getElementById('tool-polygon').classList.add('border', 'border-gray-300');
+});
+</script>
+{% endblock %}

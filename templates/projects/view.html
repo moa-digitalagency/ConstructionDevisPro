@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block title %}{{ project.name }}{% endblock %}
+{% block page_title %}{{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-wrap items-center gap-4">
+        <a href="{{ url_for('projects.index') }}" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-arrow-left mr-2"></i> Retour
+        </a>
+        <span class="px-3 py-1 text-sm rounded-full 
+            {% if project.status.value == 'draft' %}bg-gray-100 text-gray-600
+            {% elif project.status.value == 'in_progress' %}bg-blue-100 text-blue-600
+            {% elif project.status.value == 'quote_ready' %}bg-green-100 text-green-600
+            {% else %}bg-gray-100 text-gray-600{% endif %}">
+            {{ project.status.value|replace('_', ' ')|capitalize }}
+        </span>
+    </div>
+    
+    <div class="grid lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white rounded-xl shadow p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Informations projet</h2>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Référence</p>
+                        <p class="font-medium">{{ project.reference or '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Type</p>
+                        <p class="font-medium">{{ project.project_type.value|capitalize }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Typologie</p>
+                        <p class="font-medium">{{ project.typology.value|capitalize }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Gamme</p>
+                        <p class="font-medium">{{ project.default_tier.name if project.default_tier else 'Standard' }}</p>
+                    </div>
+                </div>
+                
+                {% if project.notes %}
+                <div class="mt-4 pt-4 border-t">
+                    <p class="text-sm text-gray-500">Notes</p>
+                    <p class="text-gray-700">{{ project.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-800">Plans</h2>
+                    <a href="{{ url_for('projects.plans', project_id=project.id) }}" class="text-primary hover:underline text-sm">
+                        <i class="fas fa-plus mr-1"></i> Ajouter un plan
+                    </a>
+                </div>
+                
+                {% if project.plans.count() > 0 %}
+                <div class="space-y-3">
+                    {% for plan in project.plans %}
+                    <div class="flex items-center justify-between p-4 border rounded-lg hover:border-primary transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-gray-100 rounded flex items-center justify-center">
+                                <i class="fas fa-file-pdf text-red-500"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">{{ plan.name }}</p>
+                                <p class="text-sm text-gray-500">
+                                    {{ plan.file_type|upper }} • 
+                                    {% if plan.is_calibrated %}
+                                    <span class="text-green-600"><i class="fas fa-check"></i> Calibré</span>
+                                    {% else %}
+                                    <span class="text-orange-600"><i class="fas fa-exclamation"></i> Non calibré</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            {% if not plan.is_calibrated %}
+                            <a href="{{ url_for('projects.calibrate', project_id=project.id, plan_id=plan.id) }}" 
+                               class="text-orange-600 hover:text-orange-800 px-3 py-1 border border-orange-300 rounded text-sm">
+                                Calibrer
+                            </a>
+                            {% else %}
+                            <a href="{{ url_for('projects.measure', project_id=project.id, plan_id=plan.id) }}" 
+                               class="text-primary hover:text-secondary px-3 py-1 border border-primary rounded text-sm">
+                                Mesurer
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-file-upload text-4xl text-gray-300 mb-4"></i>
+                    <p>Aucun plan uploadé</p>
+                    <a href="{{ url_for('projects.plans', project_id=project.id) }}" class="text-primary hover:underline">
+                        Uploader votre premier plan
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-800">Devis</h2>
+                    <a href="{{ url_for('quotes.new', project_id=project.id) }}" class="text-primary hover:underline text-sm">
+                        <i class="fas fa-plus mr-1"></i> Créer un devis
+                    </a>
+                </div>
+                
+                {% if project.quotes.count() > 0 %}
+                <div class="space-y-3">
+                    {% for quote in project.quotes %}
+                    <a href="{{ url_for('quotes.view', quote_id=quote.id) }}" class="block p-4 border rounded-lg hover:border-primary transition">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-gray-800">{{ quote.reference }}</p>
+                                <p class="text-sm text-gray-500">Version {{ quote.current_version }}</p>
+                            </div>
+                            <span class="px-3 py-1 text-xs rounded-full 
+                                {% if quote.status.value == 'draft' %}bg-gray-100 text-gray-600
+                                {% elif quote.status.value == 'sent' %}bg-blue-100 text-blue-600
+                                {% elif quote.status.value == 'accepted' %}bg-green-100 text-green-600
+                                {% else %}bg-gray-100 text-gray-600{% endif %}">
+                                {{ quote.status.value|capitalize }}
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-file-invoice text-4xl text-gray-300 mb-4"></i>
+                    <p>Aucun devis créé</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="space-y-6">
+            <div class="bg-white rounded-xl shadow p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Client</h2>
+                {% if project.client_name %}
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-sm text-gray-500">Nom</p>
+                        <p class="font-medium">{{ project.client_name }}</p>
+                    </div>
+                    {% if project.client_email %}
+                    <div>
+                        <p class="text-sm text-gray-500">Email</p>
+                        <p class="font-medium">{{ project.client_email }}</p>
+                    </div>
+                    {% endif %}
+                    {% if project.client_phone %}
+                    <div>
+                        <p class="text-sm text-gray-500">Téléphone</p>
+                        <p class="font-medium">{{ project.client_phone }}</p>
+                    </div>
+                    {% endif %}
+                    {% if project.client_address %}
+                    <div>
+                        <p class="text-sm text-gray-500">Adresse</p>
+                        <p class="font-medium">{{ project.client_address }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <p class="text-gray-500 text-sm">Aucun client renseigné</p>
+                {% endif %}
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Actions</h2>
+                <div class="space-y-3">
+                    <a href="{{ url_for('projects.plans', project_id=project.id) }}" class="w-full bg-primary text-white py-2 rounded-lg font-medium hover:bg-secondary transition flex items-center justify-center">
+                        <i class="fas fa-upload mr-2"></i> Uploader un plan
+                    </a>
+                    <a href="{{ url_for('projects.questions', project_id=project.id) }}" class="w-full border border-primary text-primary py-2 rounded-lg font-medium hover:bg-blue-50 transition flex items-center justify-center">
+                        <i class="fas fa-question-circle mr-2"></i> Questionnaire
+                    </a>
+                    <a href="{{ url_for('quotes.new', project_id=project.id) }}" class="w-full border border-gray-300 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-50 transition flex items-center justify-center">
+                        <i class="fas fa-file-invoice-dollar mr-2"></i> Générer un devis
+                    </a>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Pièces</h2>
+                {% if project.rooms.count() > 0 %}
+                <div class="space-y-2">
+                    {% for room in project.rooms %}
+                    <div class="flex items-center justify-between py-2 border-b last:border-0">
+                        <span class="text-gray-700">{{ room.name }}</span>
+                        <span class="text-sm text-gray-500">{{ room.area|round(2) if room.area else '-' }} m²</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-gray-500 text-sm">Aucune pièce définie</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

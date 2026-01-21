@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Configuration terminée{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+    <div class="max-w-lg w-full text-center">
+        <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-check text-white text-3xl"></i>
+        </div>
+        
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">Configuration terminée!</h2>
+        <p class="text-gray-600 mb-8">
+            Votre espace DevisPro est prêt. Vous pouvez maintenant créer vos premiers projets 
+            et générer des devis professionnels.
+        </p>
+        
+        <div class="bg-white rounded-xl shadow p-6 mb-8">
+            <h3 class="font-semibold text-gray-800 mb-4">Prochaines étapes</h3>
+            <ul class="text-left space-y-3">
+                <li class="flex items-start space-x-3">
+                    <span class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm flex-shrink-0">1</span>
+                    <span class="text-gray-600">Créez votre premier projet</span>
+                </li>
+                <li class="flex items-start space-x-3">
+                    <span class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm flex-shrink-0">2</span>
+                    <span class="text-gray-600">Uploadez un plan PDF et calibrez l'échelle</span>
+                </li>
+                <li class="flex items-start space-x-3">
+                    <span class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm flex-shrink-0">3</span>
+                    <span class="text-gray-600">Tracez les surfaces pour calculer les métrés</span>
+                </li>
+                <li class="flex items-start space-x-3">
+                    <span class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm flex-shrink-0">4</span>
+                    <span class="text-gray-600">Générez votre devis et exportez en PDF</span>
+                </li>
+            </ul>
+        </div>
+        
+        <form method="POST">
+            <button type="submit" class="bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-secondary transition shadow-lg">
+                <i class="fas fa-rocket mr-2"></i>
+                Accéder à mon espace
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

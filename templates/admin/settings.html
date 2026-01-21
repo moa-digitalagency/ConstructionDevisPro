@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Paramètres{% endblock %}
+{% block page_title %}Paramètres de l'entreprise{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Informations entreprise</h2>
+        <form method="POST" class="space-y-4">
+            <input type="hidden" name="section" value="company">
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nom commercial</label>
+                    <input type="text" name="name" value="{{ company.name }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Raison sociale</label>
+                    <input type="text" name="legal_name" value="{{ branding.legal_name or '' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
+                    <textarea name="address" rows="2"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">{{ branding.address or '' }}</textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                    <input type="tel" name="phone" value="{{ branding.phone or '' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" name="email" value="{{ branding.email or '' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Site web</label>
+                    <input type="url" name="website" value="{{ branding.website or '' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">N° RC</label>
+                    <input type="text" name="registration_number" value="{{ branding.registration_number or '' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">IF</label>
+                    <input type="text" name="tax_id" value="{{ branding.tax_id or '' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition">
+                    Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Paramètres fiscaux</h2>
+        <form method="POST" class="space-y-4">
+            <input type="hidden" name="section" value="tax">
+            <div class="grid md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Taux TVA (%)</label>
+                    <input type="number" name="vat_rate" step="0.01" value="{{ tax_profile.default_vat_rate|float }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Délai de paiement (jours)</label>
+                    <input type="number" name="payment_terms" value="{{ tax_profile.payment_terms_days }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Acompte (%)</label>
+                    <input type="number" name="deposit" step="0.01" value="{{ tax_profile.deposit_percentage|float }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Conditions de paiement</label>
+                <textarea name="payment_conditions" rows="2"
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">{{ tax_profile.payment_conditions or '' }}</textarea>
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition">
+                    Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Personnalisation des devis</h2>
+        <form method="POST" enctype="multipart/form-data" class="space-y-4">
+            <input type="hidden" name="section" value="branding">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Logo</label>
+                <input type="file" name="logo" accept="image/*"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                {% if branding.logo_path %}
+                <p class="text-sm text-gray-500 mt-1">Logo actuel: {{ branding.logo_path }}</p>
+                {% endif %}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Coordonnées bancaires</label>
+                <textarea name="bank_details" rows="3"
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                          placeholder="IBAN, BIC, nom de banque...">{{ branding.bank_details or '' }}</textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Pied de page devis</label>
+                <textarea name="quote_footer" rows="2"
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">{{ branding.quote_footer or '' }}</textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Conditions générales</label>
+                <textarea name="quote_terms" rows="4"
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">{{ branding.quote_terms or '' }}</textarea>
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition">
+                    Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

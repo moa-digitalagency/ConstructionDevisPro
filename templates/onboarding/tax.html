@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Configuration - Profil fiscal{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+    <div class="max-w-lg w-full">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-percentage text-white text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800">Profil fiscal</h2>
+            <p class="text-gray-500 mt-2">Étape 2 sur 5 - Paramètres de TVA et paiement</p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow p-8">
+            <form method="POST" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Taux de TVA par défaut (%)</label>
+                    <input type="number" name="vat_rate" step="0.01" value="{{ tax_profile.default_vat_rate|float }}"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="checkbox" name="vat_included" id="vat_included" 
+                           {% if tax_profile.vat_included %}checked{% endif %}
+                           class="rounded border-gray-300 text-primary focus:ring-primary">
+                    <label for="vat_included" class="ml-2 text-gray-700">Afficher les prix TTC par défaut</label>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Délai de paiement (jours)</label>
+                    <select name="payment_terms" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="15" {% if tax_profile.payment_terms_days == 15 %}selected{% endif %}>15 jours</option>
+                        <option value="30" {% if tax_profile.payment_terms_days == 30 %}selected{% endif %}>30 jours</option>
+                        <option value="45" {% if tax_profile.payment_terms_days == 45 %}selected{% endif %}>45 jours</option>
+                        <option value="60" {% if tax_profile.payment_terms_days == 60 %}selected{% endif %}>60 jours</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Acompte à la commande (%)</label>
+                    <input type="number" name="deposit" step="0.01" value="{{ tax_profile.deposit_percentage|float }}"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Conditions de paiement</label>
+                    <textarea name="payment_conditions" rows="2"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                              placeholder="Ex: Acompte de 30% à la commande, solde à la réception...">{{ tax_profile.payment_conditions or '' }}</textarea>
+                </div>
+                
+                <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-secondary transition">
+                    Continuer <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
