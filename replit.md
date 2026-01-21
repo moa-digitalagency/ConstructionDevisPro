@@ -74,6 +74,16 @@ The server runs on port 5000.
 - Currency: MAD (Moroccan Dirham) default
 - VAT: 20% default
 
+## Demo Account
+- **Email**: admin@devispro.com
+- **Password**: Admin123!
+- Auto-created via environment variables DEMO_SUPERADMIN_EMAIL and DEMO_SUPERADMIN_PASSWORD
+
 ## Recent Changes
-- Initial project setup (January 2026)
+- January 2026: Initial project setup
 - Full MVP implementation with all core features
+- Added favicon on all pages
+- Improved design with color-coded blocks (gradients by section)
+- Added plan reader service for DWG/DXF/PDF analysis
+- Added BPU service for library management and Excel import/export
+- Fixed settings page for new companies without branding/tax profiles

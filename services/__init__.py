@@ -12,3 +12,8 @@ try:
     from services.export_service import ExportService
 except ImportError:
     pass
+
+try:
+    from services.bpu_service import BPUService
+except ImportError:
+    pass
