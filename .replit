@@ -34,3 +34,9 @@ outputType = "webview"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[userenv]
+
+[userenv.shared]
+DEMO_SUPERADMIN_EMAIL = "admin@devispro.com"
+DEMO_SUPERADMIN_PASSWORD = "Admin123!"

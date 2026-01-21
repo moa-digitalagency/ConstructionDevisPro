@@ -1,4 +1,5 @@
-from models import db, Role, BPULibrary, BPUArticle, QuestionTemplate
+import os
+from models import db, Role, BPULibrary, BPUArticle, QuestionTemplate, Company, User, UserRole
 from datetime import date
 
 
@@ -6,6 +7,46 @@ def seed_initial_data():
     seed_roles()
     seed_bpu_library()
     seed_question_templates()
+    seed_demo_superadmin()
+
+
+def seed_demo_superadmin():
+    email = os.environ.get('DEMO_SUPERADMIN_EMAIL', 'admin@devispro.com')
+    password = os.environ.get('DEMO_SUPERADMIN_PASSWORD', 'Admin123!')
+    
+    existing = User.query.filter_by(email=email).first()
+    if existing:
+        return
+    
+    owner_role = Role.query.filter_by(name='owner').first()
+    if not owner_role:
+        return
+    
+    company = Company(
+        name='DevisPro Demo',
+        slug='devispro-demo',
+        country='MA',
+        currency='MAD',
+        onboarding_completed=True
+    )
+    db.session.add(company)
+    db.session.flush()
+    
+    user = User(
+        email=email,
+        first_name='Admin',
+        last_name='Demo',
+        company_id=company.id,
+        is_company_owner=True,
+        is_active=True
+    )
+    user.set_password(password)
+    db.session.add(user)
+    db.session.flush()
+    
+    user_role = UserRole(user_id=user.id, role_id=owner_role.id)
+    db.session.add(user_role)
+    db.session.commit()
 
 
 def seed_roles():
