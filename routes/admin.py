@@ -134,8 +134,20 @@ def audit_log():
 @login_required
 @require_permission('can_manage_users')
 def settings():
+    from models import CompanyBranding, TaxProfile
+    
     company = current_user.company
+    
+    if not company.branding:
+        branding = CompanyBranding(company_id=company.id)
+        db.session.add(branding)
+        db.session.commit()
     branding = company.branding
+    
+    if not company.tax_profile:
+        tax_profile = TaxProfile(company_id=company.id)
+        db.session.add(tax_profile)
+        db.session.commit()
     tax_profile = company.tax_profile
     
     if request.method == 'POST':
