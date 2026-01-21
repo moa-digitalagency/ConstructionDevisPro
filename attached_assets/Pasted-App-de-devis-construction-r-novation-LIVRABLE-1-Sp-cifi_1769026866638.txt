@@ -1,0 +1,117 @@
+App de devis construction / rénovation
+ 
+LIVRABLE 1 — Spécification fonctionnelle (MUST / SHOULD / COULD)
+1) Vision produit
+SaaS multi-entreprises permettant de :
+• Importer des plans DWG/DXF et PDF (vectoriel + scanné assisté)
+• Produire métrés + DQE/BPU + devis client
+• Déclencher un moteur de questions si des informations nécessaires manquent
+• Gérer une bibliothèque BPU par pays, incluse, modifiable par entreprise
+• Travailler en multi-pays / multi-devises avec gammes (Éco/Standard/Premium)
+• Exporter PDF + Excel (Word option)
+2) Rôles et droits (RBAC)
+MUST
+• Rôles : Owner/Admin, Métreur, Commercial, Lecture seule
+• Permissions fines :
+o Admin : tout
+o Métreur : projets/plans/métrés/BPU (si autorisé)
+o Commercial : devis + exports (sans toucher au BPU si interdit)
+o Read-only : lecture uniquement
+• Traçabilité : journal d’audit sur modifications (prix, quantités, taxes, templates, devis)
+SHOULD
+• Paramètre “marge max autorisée” par rôle (ex : Commercial ≤ 15%)
+3) Parcours utilisateur (workflows)
+3.1 Onboarding entreprise
+MUST
+1. Création entreprise (tenant)
+2. Choix pays principal + devise principale
+3. Profil fiscal (TVA/taxes/conditions paiement)
+4. Activation BPU pays (ex : Maroc 2025.1)
+5. Définition gammes (Éco/Standard/Premium : coefficients + arrondi)
+6. Branding (logo, infos légales, modèle devis)
+3.2 Création projet / devis (wizard)
+MUST
+1. Type : construction / rénovation / extension / aménagement
+2. Typologie : villa / immeuble / riad / bureau / commerce…
+3. Gamme par défaut
+4. Upload plan : DWG/DXF ou PDF
+5. Détection : DWG/DXF, PDF vectoriel, PDF scanné
+6. Calibration échelle si nécessaire
+7. Extraction métrés (job) ou mode assisté (scan)
+8. Moteur de questions (si données manquantes)
+9. Génération DQE/BPU + devis
+10. Validation & export PDF/Excel
+4) Module Plans & Métrés
+MUST
+• Importer : DWG/DXF, PDF
+• Versionner les plans (v1, v2…) par projet
+• DWG/DXF : extraction polylignes/blocs + mapping calques (assistant de mapping)
+• PDF scanné : assisté uniquement
+o Calibration (2 points + distance réelle)
+o Outil de traçage (polygones) : pièces/murs/ouvertures
+• Résultat : quantités normalisées (m², ml, u, m³)
+SHOULD
+• PDF vectoriel : extraction semi-assistée (sélection de zone)
+• Indicateur “confiance” par métrés (faible/moyen/fort)
+• Historique des quantités (source, auteur, version plan)
+COULD
+• OCR et lecture automatique des cotations sur PDF scanné (V2/V3)
+5) Moteur de questions (règles)
+MUST
+• Déclencher des questions uniquement si nécessaires au chiffrage
+• Questions minimales V1 :
+o Hauteur sous plafond (par niveau)
+o Menuiseries (alu/PVC/bois + vitrage)
+o Revêtements sols (par zones ou global)
+o SDB : revêtement murs + hauteur
+o Clim : split/gainable/aucune + quantités
+o Démolition : oui/non + difficulté évacuation
+o Piscine : oui/non + dimensions + système
+• Chaque réponse alimente :
+o hypothèses projet
+o règles de calcul (formules)
+o lignes du devis + annexes
+SHOULD
+• Valeurs par défaut + “appliquer à toutes les pièces”
+• “Hypothèses non confirmées” clairement listées
+6) BPU & Gammes
+MUST
+• Bibliothèque BPU par pays fournie (versionnée)
+• Entreprise peut :
+o overrider prix/texte d’un article
+o désactiver un article
+o créer ses articles propres
+• Gammes :
+o Coefficient global par gamme
+o Exceptions : prix fixe par gamme sur certains articles
+• Import/Export Excel du BPU entreprise
+SHOULD
+• Mise à jour de la library pays (2025.1 → 2026.0) en conservant les overrides
+7) Devis, DQE, Exports
+MUST
+• Devis versionné (V1/V2/V3) + diff
+• Calcul totaux : HT, TVA, TTC (règles pays/entreprise)
+• Exports :
+o PDF (template)
+o Excel (DQE/BPU)
+• Annexes :
+o hypothèses
+o sources des quantités (DWG/PDF/manuel)
+COULD
+• Export Word (V2)
+8) Abonnement (Stripe) & Quotas
+MUST
+• Abonnement mensuel par entreprise (Starter/Pro/Business)
+• Webhooks Stripe pour activer/suspendre l’accès
+• Quotas par plan :
+o nb utilisateurs
+o projets actifs
+o stockage (Go)
+• Mode “facture + virement” (compte Business/Enterprise) : accès activé
+manuellement par Admin plateforme
+9) Critères d’acceptation (qualité)
+MUST
+• DWG/DXF : écart métrés < 3% vs métrés manuels sur plans tests
+• PDF scanné assisté : écart < 2% (dépend du traçage)
+• Export PDF/Excel : conforme template + totaux corrects
+• Isolation tenant : impossible d’accéder aux données d’une autre entreprise
