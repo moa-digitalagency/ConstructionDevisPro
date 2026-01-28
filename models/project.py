@@ -49,10 +49,10 @@ class Project(db.Model, TimestampMixin):
     
     company = db.relationship('Company', back_populates='projects')
     default_tier = db.relationship('PricingTier')
-    plans = db.relationship('ProjectPlan', back_populates='project', lazy='dynamic', cascade='all, delete-orphan')
-    rooms = db.relationship('Room', back_populates='project', lazy='dynamic', cascade='all, delete-orphan')
-    quotes = db.relationship('Quote', back_populates='project', lazy='dynamic', cascade='all, delete-orphan')
-    answers = db.relationship('ProjectAnswer', back_populates='project', lazy='dynamic', cascade='all, delete-orphan')
+    plans = db.relationship('ProjectPlan', back_populates='project', cascade='all, delete-orphan')
+    rooms = db.relationship('Room', back_populates='project', cascade='all, delete-orphan')
+    quotes = db.relationship('Quote', back_populates='project', cascade='all, delete-orphan')
+    answers = db.relationship('ProjectAnswer', back_populates='project', cascade='all, delete-orphan')
 
     def generate_reference(self):
         year = datetime.utcnow().year
