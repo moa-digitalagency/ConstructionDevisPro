@@ -47,7 +47,7 @@ class QuoteGenerator:
             Room.project_id == self.project.id
         ).all()
         
-        answers = {a.question.code: a for a in self.project.answers.all()}
+        answers = {a.question.code: a for a in self.project.answers}
         
         sort_order = 0
         
@@ -222,7 +222,7 @@ class QuoteGenerator:
         return sort_order + 1
     
     def _generate_assumptions(self, version):
-        answers = self.project.answers.all()
+        answers = self.project.answers
         
         for answer in answers:
             assumption = QuoteAssumption(

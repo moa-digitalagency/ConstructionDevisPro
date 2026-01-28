@@ -56,7 +56,7 @@
                     </a>
                 </div>
                 
-                {% if project.plans.count() > 0 %}
+                {% if project.plans %}
                 <div class="space-y-3">
                     {% for plan in project.plans %}
                     <div class="flex items-center justify-between p-4 border rounded-lg hover:border-primary transition">
@@ -111,7 +111,7 @@
                     </a>
                 </div>
                 
-                {% if project.quotes.count() > 0 %}
+                {% if project.quotes %}
                 <div class="space-y-3">
                     {% for quote in project.quotes %}
                     <a href="{{ url_for('quotes.view', quote_id=quote.id) }}" class="block p-4 border rounded-lg hover:border-primary transition">
@@ -190,7 +190,7 @@
             
             <div class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4">Pièces</h2>
-                {% if project.rooms.count() > 0 %}
+                {% if project.rooms %}
                 <div class="space-y-2">
                     {% for room in project.rooms %}
                     <div class="flex items-center justify-between py-2 border-b last:border-0">

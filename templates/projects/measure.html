@@ -99,7 +99,7 @@
                     <div class="flex items-center justify-between text-lg font-semibold">
                         <span>Total</span>
                         <span class="text-primary" id="total-area">
-                            {{ project.rooms.all()|sum(attribute='area')|round(2) if project.rooms.count() > 0 else 0 }} m²
+                            {{ project.rooms|sum(attribute='area')|round(2) if project.rooms else 0 }} m²
                         </span>
                     </div>
                 </div>
