@@ -25,12 +25,6 @@
             border-left: 3px solid #1a56db;
             color: #1a56db;
         }
-        .dropdown-menu {
-            display: none;
-        }
-        .dropdown:hover .dropdown-menu {
-            display: block;
-        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
@@ -93,28 +87,28 @@
         <div class="flex-1 flex flex-col overflow-hidden">
             <header class="bg-white shadow-sm border-b px-6 py-4 flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <button class="md:hidden text-gray-600" onclick="toggleMobileMenu()">
-                        <i class="fas fa-bars text-xl"></i>
+                    <button class="md:hidden text-gray-600" onclick="toggleMobileMenu()" aria-label="Toggle navigation menu" aria-expanded="false">
+                        <i class="fas fa-bars text-xl" aria-hidden="true"></i>
                     </button>
                     <h1 class="text-xl font-semibold text-gray-800">{% block page_title %}Tableau de bord{% endblock %}</h1>
                 </div>
                 
                 <div class="flex items-center space-x-4">
-                    <div class="dropdown relative">
-                        <button class="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
+                    <div class="relative">
+                        <button id="user-menu-button" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary rounded-md p-1" aria-expanded="false" aria-haspopup="true" onclick="toggleUserMenu()">
                             <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-medium">
                                 {{ current_user.first_name[0] if current_user.first_name else current_user.email[0]|upper }}
                             </div>
                             <span class="hidden sm:inline">{{ current_user.full_name }}</span>
-                            <i class="fas fa-chevron-down text-xs"></i>
+                            <i class="fas fa-chevron-down text-xs" aria-hidden="true"></i>
                         </button>
-                        <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                        <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 ring-1 ring-black ring-opacity-5 focus:outline-none" aria-labelledby="user-menu-button">
                             <a href="{{ url_for('admin.settings') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-cog mr-2"></i> Paramètres
+                                <i class="fas fa-cog mr-2" aria-hidden="true"></i> Paramètres
                             </a>
                             <hr class="my-2">
                             <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-red-600 hover:bg-gray-100">
-                                <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion
+                                <i class="fas fa-sign-out-alt mr-2" aria-hidden="true"></i> Déconnexion
                             </a>
                         </div>
                     </div>
@@ -161,11 +155,53 @@
     <script>
         function toggleMobileMenu() {
             const sidebar = document.querySelector('aside');
-            sidebar.classList.toggle('hidden');
+            const isHidden = sidebar.classList.toggle('hidden');
             sidebar.classList.toggle('fixed');
             sidebar.classList.toggle('inset-0');
             sidebar.classList.toggle('z-50');
+
+            const btn = document.querySelector('button[onclick="toggleMobileMenu()"]');
+            if (btn) btn.setAttribute('aria-expanded', !isHidden);
         }
+
+        function toggleUserMenu() {
+            const menu = document.getElementById('user-menu');
+            const btn = document.getElementById('user-menu-button');
+            const isHidden = menu.classList.contains('hidden');
+
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                btn.setAttribute('aria-expanded', 'true');
+            } else {
+                menu.classList.add('hidden');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        window.addEventListener('click', function(e) {
+            const menu = document.getElementById('user-menu');
+            const btn = document.getElementById('user-menu-button');
+
+            if (menu && !menu.classList.contains('hidden') && !menu.contains(e.target) && !btn.contains(e.target)) {
+                menu.classList.add('hidden');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Close on Escape key
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const menu = document.getElementById('user-menu');
+                const btn = document.getElementById('user-menu-button');
+
+                if (menu && !menu.classList.contains('hidden')) {
+                    menu.classList.add('hidden');
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.focus();
+                }
+            }
+        });
     </script>
     {% block extra_js %}{% endblock %}
 </body>
