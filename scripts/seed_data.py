@@ -334,6 +334,51 @@ def seed_question_templates():
             'default_value': 'Filtration à sable',
             'is_required': False,
             'sort_order': 12
+        },
+        {
+            'code': 'kitchen_standing',
+            'category': 'Cuisine',
+            'question_text': 'Quel standing pour la cuisine ?',
+            'question_type': 'select',
+            'options': ['Économique (Mélaminé)', 'Standard (MDF Laqué)', 'Premium (Bois massif / Import)'],
+            'default_value': 'Standard (MDF Laqué)',
+            'sort_order': 20
+        },
+        {
+            'code': 'kitchen_worktop',
+            'category': 'Cuisine',
+            'question_text': 'Type de plan de travail ?',
+            'question_type': 'select',
+            'options': ['Granit local', 'Quartz / Silestone', 'Marbre', 'Céramique'],
+            'default_value': 'Granit local',
+            'sort_order': 21
+        },
+        {
+            'code': 'sanitary_brand',
+            'category': 'Sanitaires',
+            'question_text': 'Marque/Gamme des sanitaires ?',
+            'question_type': 'select',
+            'options': ['Standard local (Roca...)', 'Intermédiaire (Grohe, Geberit)', 'Luxe (Villeroy & Boch, Hansgrohe)'],
+            'default_value': 'Standard local (Roca...)',
+            'sort_order': 30
+        },
+        {
+            'code': 'home_automation',
+            'category': 'Électricité',
+            'question_text': 'Domotique souhaitée ?',
+            'question_type': 'select',
+            'options': ['Aucune', 'Partielle (Volets, Lumières)', 'Complète (Smart Home)'],
+            'default_value': 'Aucune',
+            'sort_order': 40
+        },
+        {
+            'code': 'garden_landscaping',
+            'category': 'Aménagements Extérieurs',
+            'question_text': 'Aménagement paysager requis ?',
+            'question_type': 'select',
+            'options': ['Non', 'Gazon et arrosage simple', 'Paysagisme complet'],
+            'default_value': 'Non',
+            'sort_order': 50
         }
     ]
     

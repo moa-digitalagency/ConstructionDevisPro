@@ -25,6 +25,9 @@
                         <button id="tool-line" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">
                             <i class="fas fa-ruler mr-1"></i> Ligne
                         </button>
+                        <button id="tool-magic" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50" title="Détection automatique">
+                            <i class="fas fa-magic mr-1"></i> Auto
+                        </button>
                         <button id="btn-clear" class="px-4 py-2 border border-red-300 text-red-600 rounded-lg text-sm hover:bg-red-50">
                             <i class="fas fa-trash mr-1"></i> Effacer
                         </button>
@@ -34,6 +37,12 @@
                 <div id="canvas-container" class="border rounded-lg overflow-hidden bg-gray-100 relative" style="height: 600px;">
                     <canvas id="pdf-canvas" class="absolute top-0 left-0"></canvas>
                     <canvas id="draw-canvas" class="absolute top-0 left-0 cursor-crosshair"></canvas>
+                    <div id="loading-overlay" class="absolute inset-0 bg-white bg-opacity-75 hidden flex items-center justify-center z-10">
+                        <div class="text-center">
+                            <i class="fas fa-circle-notch fa-spin text-4xl text-primary mb-2"></i>
+                            <p class="font-medium text-gray-800">Détection en cours...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -120,6 +129,8 @@ const drawCtx = drawCanvas.getContext('2d');
 const scaleFactor = {{ plan.scale_factor or 1 }};
 let points = [];
 let currentTool = 'polygon';
+let isDragging = false;
+let dragIndex = -1;
 
 {% if plan.file_type == 'pdf' %}
 const loadingTask = pdfjsLib.getDocument('/{{ plan.file_path }}');
@@ -142,57 +153,115 @@ loadingTask.promise.then(function(pdf) {
 });
 {% endif %}
 
-drawCanvas.addEventListener('click', function(e) {
-    const rect = drawCanvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    points.push({x: x, y: y});
-    drawPoint(x, y);
-    
-    if (points.length > 1) {
-        drawLine(points[points.length - 2], points[points.length - 1]);
-    }
-    
-    if (points.length >= 3) {
-        calculateArea();
-    }
-});
+function redraw() {
+    drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
 
-drawCanvas.addEventListener('dblclick', function(e) {
-    if (points.length >= 3) {
-        drawLine(points[points.length - 1], points[0]);
-        fillPolygon();
-    }
-});
+    if (points.length === 0) return;
 
-function drawPoint(x, y) {
-    drawCtx.beginPath();
-    drawCtx.arc(x, y, 4, 0, 2 * Math.PI);
-    drawCtx.fillStyle = '#1a56db';
-    drawCtx.fill();
-}
-
-function drawLine(p1, p2) {
-    drawCtx.beginPath();
-    drawCtx.moveTo(p1.x, p1.y);
-    drawCtx.lineTo(p2.x, p2.y);
-    drawCtx.strokeStyle = '#1a56db';
-    drawCtx.lineWidth = 2;
-    drawCtx.stroke();
-}
-
-function fillPolygon() {
     drawCtx.beginPath();
     drawCtx.moveTo(points[0].x, points[0].y);
     for (let i = 1; i < points.length; i++) {
         drawCtx.lineTo(points[i].x, points[i].y);
     }
-    drawCtx.closePath();
-    drawCtx.fillStyle = 'rgba(26, 86, 219, 0.2)';
-    drawCtx.fill();
+    // Close path if enough points and not just a line tool
+    if (points.length >= 3 && currentTool !== 'line') {
+        drawCtx.closePath();
+        drawCtx.fillStyle = 'rgba(26, 86, 219, 0.2)';
+        drawCtx.fill();
+    }
+
+    drawCtx.strokeStyle = '#1a56db';
+    drawCtx.lineWidth = 2;
+    drawCtx.stroke();
+
+    // Draw vertices
+    points.forEach((p, i) => {
+        drawCtx.beginPath();
+        drawCtx.arc(p.x, p.y, 5, 0, 2 * Math.PI);
+        drawCtx.fillStyle = (i === dragIndex) ? '#f59e0b' : '#1a56db';
+        drawCtx.fill();
+        drawCtx.strokeStyle = 'white';
+        drawCtx.lineWidth = 1;
+        drawCtx.stroke();
+    });
+
+    if (points.length >= 3) {
+        calculateArea();
+        document.getElementById('btn-save-room').disabled = false;
+    }
+}
+
+drawCanvas.addEventListener('mousedown', function(e) {
+    const rect = drawCanvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
     
-    document.getElementById('btn-save-room').disabled = false;
+    // Check if clicking existing point
+    for (let i = 0; i < points.length; i++) {
+        const p = points[i];
+        const dist = Math.sqrt((p.x - x)**2 + (p.y - y)**2);
+        if (dist < 8) {
+            isDragging = true;
+            dragIndex = i;
+            redraw();
+            return;
+        }
+    }
+    
+    // If Magic Wand
+    if (currentTool === 'magic') {
+        autoDetectRoom(x, y);
+        return;
+    }
+    
+    // If polygon tool, add point
+    if (currentTool === 'polygon' || currentTool === 'line') {
+        points.push({x: x, y: y});
+        redraw();
+    }
+});
+
+drawCanvas.addEventListener('mousemove', function(e) {
+    if (isDragging && dragIndex !== -1) {
+        const rect = drawCanvas.getBoundingClientRect();
+        points[dragIndex].x = e.clientX - rect.left;
+        points[dragIndex].y = e.clientY - rect.top;
+        redraw();
+    }
+});
+
+drawCanvas.addEventListener('mouseup', function(e) {
+    isDragging = false;
+    dragIndex = -1;
+    redraw();
+});
+
+function autoDetectRoom(startX, startY) {
+    document.getElementById('loading-overlay').classList.remove('hidden');
+    
+    // Simulate detection (in a real app, this would use computer vision)
+    setTimeout(() => {
+        // Create a default box around click point
+        const pixelsPerMeter = 1 / scaleFactor;
+        const boxSize = pixelsPerMeter * 4; // 4 meters
+        const half = boxSize / 2;
+
+        points = [
+            {x: startX - half, y: startY - half},
+            {x: startX + half, y: startY - half},
+            {x: startX + half, y: startY + half},
+            {x: startX - half, y: startY + half}
+        ];
+
+        document.getElementById('loading-overlay').classList.add('hidden');
+        redraw();
+
+        document.getElementById('room_name').value = "Pièce Auto";
+        // Switch back to polygon tool for editing
+        currentTool = 'polygon';
+        updateToolButtons(document.getElementById('tool-polygon'));
+
+    }, 600);
 }
 
 function calculateArea() {
@@ -213,7 +282,7 @@ function calculateArea() {
 
 document.getElementById('btn-clear').addEventListener('click', function() {
     points = [];
-    drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+    redraw();
     document.getElementById('calculated_area').textContent = '- m²';
     document.getElementById('btn-save-room').disabled = true;
 });
@@ -262,18 +331,30 @@ document.getElementById('btn-save-room').addEventListener('click', function() {
 
 document.getElementById('tool-polygon').addEventListener('click', function() {
     currentTool = 'polygon';
-    this.classList.add('bg-primary', 'text-white');
-    this.classList.remove('border', 'border-gray-300');
-    document.getElementById('tool-line').classList.remove('bg-primary', 'text-white');
-    document.getElementById('tool-line').classList.add('border', 'border-gray-300');
+    updateToolButtons(this);
 });
 
 document.getElementById('tool-line').addEventListener('click', function() {
     currentTool = 'line';
-    this.classList.add('bg-primary', 'text-white');
-    this.classList.remove('border', 'border-gray-300');
-    document.getElementById('tool-polygon').classList.remove('bg-primary', 'text-white');
-    document.getElementById('tool-polygon').classList.add('border', 'border-gray-300');
+    updateToolButtons(this);
 });
+
+document.getElementById('tool-magic').addEventListener('click', function() {
+    currentTool = 'magic';
+    updateToolButtons(this);
+});
+
+function updateToolButtons(activeBtn) {
+    ['tool-polygon', 'tool-line', 'tool-magic'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn === activeBtn) {
+            btn.classList.add('bg-primary', 'text-white');
+            btn.classList.remove('border', 'border-gray-300');
+        } else {
+            btn.classList.remove('bg-primary', 'text-white');
+            btn.classList.add('border', 'border-gray-300');
+        }
+    });
+}
 </script>
 {% endblock %}

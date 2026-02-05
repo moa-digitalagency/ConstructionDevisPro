@@ -79,3 +79,14 @@ class PricingTier(db.Model, TimestampMixin):
     __table_args__ = (
         db.UniqueConstraint('company_id', 'code', name='uq_company_tier_code'),
     )
+
+    @property
+    def price_column(self):
+        """Returns the BPU price column to use based on the tier name."""
+        name_lower = self.name.lower()
+        if 'eco' in name_lower:
+            return 'unit_price_eco'
+        elif 'premium' in name_lower or 'luxe' in name_lower:
+            return 'unit_price_premium'
+        else:
+            return 'unit_price_standard'
