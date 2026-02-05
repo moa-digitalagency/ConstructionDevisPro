@@ -8,9 +8,14 @@
         <a href="{{ url_for('bpu.index') }}" class="text-gray-500 hover:text-gray-700">
             <i class="fas fa-arrow-left mr-2"></i> Retour à la bibliothèque
         </a>
-        <a href="{{ url_for('bpu.new_custom_article') }}" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition">
-            <i class="fas fa-plus mr-2"></i> Nouvel article
-        </a>
+        <div class="flex items-center space-x-2">
+            <a href="{{ url_for('bpu.categories') }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                <i class="fas fa-tags mr-2"></i> Catégories
+            </a>
+            <a href="{{ url_for('bpu.new_custom_article') }}" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition">
+                <i class="fas fa-plus mr-2"></i> Nouvel article
+            </a>
+        </div>
     </div>
     
     <div class="bg-white rounded-xl shadow overflow-hidden">
@@ -26,6 +31,7 @@
                         <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Éco</th>
                         <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Standard</th>
                         <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Premium</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -38,6 +44,16 @@
                         <td class="px-4 py-3 text-sm text-gray-600 text-right">{{ "{:,.2f}".format(article.unit_price_eco|float) if article.unit_price_eco else '-' }}</td>
                         <td class="px-4 py-3 text-sm text-gray-600 text-right">{{ "{:,.2f}".format(article.unit_price_standard|float) if article.unit_price_standard else '-' }}</td>
                         <td class="px-4 py-3 text-sm text-gray-600 text-right">{{ "{:,.2f}".format(article.unit_price_premium|float) if article.unit_price_premium else '-' }}</td>
+                        <td class="px-4 py-3 text-sm text-right space-x-2">
+                            <a href="{{ url_for('bpu.edit_custom_article', article_id=article.id) }}" class="text-blue-600 hover:text-blue-800" title="Modifier">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ url_for('bpu.delete_custom_article', article_id=article.id) }}" method="POST" class="inline-block" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+                                <button type="submit" class="text-red-600 hover:text-red-800" title="Supprimer">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

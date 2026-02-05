@@ -112,7 +112,95 @@ def new_custom_article():
         flash('Article créé avec succès!', 'success')
         return redirect(url_for('bpu.custom_articles'))
     
-    return render_template('bpu/custom_form.html', article=None)
+    categories = db.session.query(CompanyBPUArticle.category)\
+        .filter_by(company_id=current_user.company_id)\
+        .distinct().all()
+    categories = sorted([c[0] for c in categories])
+
+    return render_template('bpu/custom_form.html', article=None, categories=categories)
+
+
+@bpu_bp.route('/custom/<int:article_id>/edit', methods=['GET', 'POST'])
+@login_required
+@require_permission('can_manage_bpu')
+def edit_custom_article(article_id):
+    article = CompanyBPUArticle.query.filter_by(
+        id=article_id,
+        company_id=current_user.company_id
+    ).first_or_404()
+
+    if request.method == 'POST':
+        code = request.form.get('code', '').strip()
+        category = request.form.get('category', '').strip()
+        subcategory = request.form.get('subcategory', '').strip()
+        designation = request.form.get('designation', '').strip()
+        unit = request.form.get('unit', '').strip()
+        price_eco = request.form.get('price_eco', type=float)
+        price_std = request.form.get('price_std', type=float)
+        price_prem = request.form.get('price_prem', type=float)
+
+        if not all([code, category, designation, unit]):
+            flash('Tous les champs obligatoires doivent être remplis.', 'error')
+            return render_template('bpu/custom_form.html', article=article)
+
+        # Check uniqueness of code only if changed
+        if code != article.code:
+            existing = CompanyBPUArticle.query.filter_by(
+                company_id=current_user.company_id,
+                code=code
+            ).first()
+            if existing:
+                flash('Un article avec ce code existe déjà.', 'error')
+                return render_template('bpu/custom_form.html', article=article)
+
+        old_values = {
+            'code': article.code,
+            'category': article.category,
+            'designation': article.designation,
+            'price_std': float(article.unit_price_standard) if article.unit_price_standard else None
+        }
+
+        article.code = code
+        article.category = category
+        article.subcategory = subcategory
+        article.designation = designation
+        article.unit = unit
+        article.unit_price_eco = price_eco
+        article.unit_price_standard = price_std
+        article.unit_price_premium = price_prem
+
+        db.session.commit()
+
+        log_action('update', 'bpu_article', article.id, old_values, {'code': code})
+
+        flash('Article modifié avec succès!', 'success')
+        return redirect(url_for('bpu.custom_articles'))
+
+    categories = db.session.query(CompanyBPUArticle.category)\
+        .filter_by(company_id=current_user.company_id)\
+        .distinct().all()
+    categories = sorted([c[0] for c in categories])
+
+    return render_template('bpu/custom_form.html', article=article, categories=categories)
+
+
+@bpu_bp.route('/custom/<int:article_id>/delete', methods=['POST'])
+@login_required
+@require_permission('can_manage_bpu')
+def delete_custom_article(article_id):
+    article = CompanyBPUArticle.query.filter_by(
+        id=article_id,
+        company_id=current_user.company_id
+    ).first_or_404()
+
+    # Soft delete
+    article.is_active = False
+    db.session.commit()
+
+    log_action('delete', 'bpu_article', article.id, None, {'code': article.code})
+
+    flash('Article supprimé.', 'success')
+    return redirect(url_for('bpu.custom_articles'))
 
 
 @bpu_bp.route('/article/<int:article_id>/override', methods=['POST'])
@@ -211,3 +299,80 @@ def import_excel():
         flash(f"Erreur lors de l'import: {result['error']}", 'error')
     
     return redirect(url_for('bpu.index'))
+
+
+@bpu_bp.route('/categories')
+@login_required
+def categories():
+    company = current_user.company
+
+    # Get categories from Standard BPU (Library)
+    library = BPULibrary.query.filter_by(country=company.country, is_active=True)\
+        .order_by(BPULibrary.version.desc()).first()
+
+    lib_categories = []
+    if library:
+        lib_cats = db.session.query(BPUArticle.category)\
+            .filter_by(library_id=library.id)\
+            .distinct().all()
+        lib_categories = [c[0] for c in lib_cats]
+
+    # Get categories from Custom BPU
+    custom_cats = db.session.query(CompanyBPUArticle.category)\
+        .filter_by(company_id=company.id, is_active=True)\
+        .distinct().all()
+    custom_categories = [c[0] for c in custom_cats]
+
+    # Merge and sort
+    all_categories = sorted(list(set(lib_categories + custom_categories)))
+
+    return render_template('bpu/categories.html', categories=all_categories)
+
+
+@bpu_bp.route('/categories/rename', methods=['POST'])
+@login_required
+@require_permission('can_manage_bpu')
+def rename_category():
+    old_name = request.form.get('old_name')
+    new_name = request.form.get('new_name')
+
+    if not old_name or not new_name:
+        flash('Noms invalides.', 'error')
+        return redirect(url_for('bpu.categories'))
+
+    # Update Custom Articles
+    count = CompanyBPUArticle.query.filter_by(
+        company_id=current_user.company_id,
+        category=old_name
+    ).update({CompanyBPUArticle.category: new_name})
+
+    db.session.commit()
+
+    if count > 0:
+        flash(f'{count} articles personnalisés mis à jour.', 'success')
+    else:
+        flash('Aucun article personnalisé trouvé dans cette catégorie (les catégories standard ne peuvent pas être renommées).', 'warning')
+
+    return redirect(url_for('bpu.categories'))
+
+
+@bpu_bp.route('/categories/delete', methods=['POST'])
+@login_required
+@require_permission('can_manage_bpu')
+def delete_category():
+    name = request.form.get('name')
+
+    # Soft delete all custom articles in this category
+    count = CompanyBPUArticle.query.filter_by(
+        company_id=current_user.company_id,
+        category=name
+    ).update({CompanyBPUArticle.is_active: False})
+
+    db.session.commit()
+
+    if count > 0:
+        flash(f'Catégorie supprimée ({count} articles archivés).', 'success')
+    else:
+        flash('Aucun article personnalisé trouvé dans cette catégorie (les catégories standard ne peuvent pas être supprimées).', 'warning')
+
+    return redirect(url_for('bpu.categories'))
