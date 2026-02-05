@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, send_file
 from flask_login import login_required, current_user
-from models import db, Quote, QuoteVersion, QuoteLine, QuoteAssumption, Project, QuoteStatus
+from models import db, Quote, QuoteVersion, QuoteLine, QuoteAssumption, Project, QuoteStatus, AuditLog
 from security.decorators import require_permission
 from security.audit import log_action
 from services.quote_generator import QuoteGenerator
@@ -81,7 +81,12 @@ def view(quote_id):
     
     current_version = quote.versions.filter_by(version_number=quote.current_version).first()
     
-    return render_template('quotes/view.html', quote=quote, current_version=current_version)
+    logs = AuditLog.query.filter_by(
+        entity_type='quote',
+        entity_id=quote.id
+    ).order_by(AuditLog.created_at.desc()).all()
+
+    return render_template('quotes/view.html', quote=quote, current_version=current_version, logs=logs)
 
 
 @quotes_bp.route('/<int:quote_id>/edit', methods=['GET', 'POST'])

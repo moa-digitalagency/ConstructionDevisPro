@@ -28,9 +28,19 @@ class Quote(db.Model, TimestampMixin):
     versions = db.relationship('QuoteVersion', back_populates='quote', lazy='dynamic', cascade='all, delete-orphan', order_by='QuoteVersion.version_number.desc()')
 
     def generate_reference(self):
+        from models.project import Project
         year = datetime.utcnow().year
+
+        project = self.project
+        if not project and self.project_id:
+            project = Project.query.get(self.project_id)
+
+        if not project:
+            # Should not happen if flow is correct
+            return
+
         count = Quote.query.join(Project).filter(
-            Project.company_id == self.project.company_id,
+            Project.company_id == project.company_id,
             db.extract('year', Quote.created_at) == year
         ).count() + 1
         self.reference = f"DEV-{year}-{count:04d}"
