@@ -16,7 +16,7 @@
         <div class="bg-white rounded-xl shadow-2xl p-8">
             <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Créer votre compte</h2>
             
-            <form method="POST" class="space-y-4">
+            <form method="POST" class="space-y-4" data-submit-loading>
                 <div>
                     <label for="company_name" class="block text-sm font-medium text-gray-700 mb-1">Nom de l'entreprise *</label>
                     <input type="text" id="company_name" name="company_name" required
@@ -60,7 +60,7 @@
                            placeholder="••••••••">
                 </div>
                 
-                <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-secondary transition">
+                <button type="submit" data-loading-text="Création..." class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-secondary transition">
                     Créer mon compte
                 </button>
             </form>

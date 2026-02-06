@@ -5,7 +5,7 @@
 {% block content %}
 <div class="max-w-3xl mx-auto">
     <div class="bg-white rounded-xl shadow p-8">
-        <form method="POST" class="space-y-6">
+        <form method="POST" class="space-y-6" data-submit-loading>
             <div class="grid md:grid-cols-2 gap-6">
                 <div class="md:col-span-2">
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nom du projet *</label>
@@ -91,7 +91,7 @@
                 <a href="{{ url_for('projects.index') }}" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
                     Annuler
                 </a>
-                <button type="submit" class="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-secondary transition">
+                <button type="submit" data-loading-text="Création..." class="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-secondary transition">
                     <i class="fas fa-save mr-2"></i>
                     Créer le projet
                 </button>
