@@ -202,6 +202,25 @@
                 }
             }
         });
+
+        // Form loading state handler
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('form[data-submit-loading]').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const btn = form.querySelector('button[type="submit"]');
+                    if (btn && !btn.disabled) {
+                        const loadingText = btn.getAttribute('data-loading-text') || 'Chargement...';
+
+                        // Set width to current width to prevent layout shift
+                        // btn.style.width = `${btn.offsetWidth}px`; // Optional: might cause issues if text is longer
+
+                        btn.disabled = true;
+                        btn.classList.add('opacity-75', 'cursor-not-allowed');
+                        btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> ${loadingText}`;
+                    }
+                });
+            });
+        });
     </script>
     {% block extra_js %}{% endblock %}
 </body>

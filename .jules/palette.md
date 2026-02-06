@@ -1,3 +1,3 @@
-## 2024-10-26 - Interaction Models
-**Learning:** Hover-based dropdowns exclude keyboard and touch users.
-**Action:** Always implement dropdowns with click handlers and proper ARIA state (`aria-expanded`) to ensure universal access. Remove `tabindex="-1"` from menu items if arrow-key navigation is not implemented.
+## 2025-02-14 - Declarative Loading States
+**Learning:** Adding complex interactive behaviors (like loading states) via data attributes (`data-submit-loading`) drastically simplifies template code and ensures consistency across the application.
+**Action:** Use data-driven behavior attachment for future micro-interactions instead of inline scripts or page-specific JS.
