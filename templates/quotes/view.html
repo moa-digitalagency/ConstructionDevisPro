@@ -162,6 +162,48 @@
                     </button>
                 </form>
             </div>
+
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="font-semibold text-gray-800 mb-4">Historique</h3>
+                <div class="space-y-4">
+                    {% if logs %}
+                        {% for log in logs %}
+                        <div class="flex items-start space-x-3 pb-3 border-b last:border-0">
+                            <div class="flex-shrink-0 mt-1">
+                                <div class="h-6 w-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                                    <i class="fas fa-history text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ log.user.full_name if log.user else 'Système' }}
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    {% if log.action == 'create' %}
+                                        A créé le devis
+                                    {% elif log.action == 'status_change' %}
+                                        A changé le statut: <span class="font-medium">{{ log.new_values.get('new_status')|default('?')|capitalize }}</span>
+                                    {% elif log.action == 'new_version' %}
+                                        A créé la version V{{ log.new_values.get('new_version') }}
+                                    {% elif log.action == 'export_pdf' %}
+                                        A exporté le PDF (V{{ log.new_values.get('version') }})
+                                    {% elif log.action == 'export_excel' %}
+                                        A exporté l'Excel (V{{ log.new_values.get('version') }})
+                                    {% else %}
+                                        {{ log.action }}
+                                    {% endif %}
+                                </p>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    {{ log.created_at.strftime('%d/%m/%Y à %H:%M') }}
+                                </p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-gray-500 text-sm italic">Aucun historique disponible.</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
