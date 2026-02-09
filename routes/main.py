@@ -12,7 +12,7 @@ def index():
         if not current_user.company.onboarding_completed:
             return redirect(url_for('onboarding.index'))
         return redirect(url_for('main.dashboard'))
-    return redirect(url_for('auth.login'))
+    return render_template('index.html')
 
 
 @main_bp.route('/dashboard')
