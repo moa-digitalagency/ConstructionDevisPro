@@ -1,0 +1,55 @@
+{
+    "app_name": "DevisPro",
+    "meta_title": "DevisPro - Construction Estimating SaaS",
+    "page_title_dashboard": "Dashboard",
+    "page_title_home": "Home",
+
+    "nav_dashboard": "Dashboard",
+    "nav_projects": "Projects",
+    "nav_quotes": "Quotes",
+    "nav_bpu": "BPU Library",
+    "nav_admin_section": "Administration",
+    "nav_users": "Users",
+    "nav_settings": "Settings",
+    "nav_audit_log": "Audit Log",
+    "nav_company": "Company",
+
+    "user_menu_settings": "Settings",
+    "user_menu_logout": "Logout",
+    "nav_login": "Login",
+    "nav_register": "Sign Up",
+
+    "landing_hero_title": "Create Your Construction Quotes in a Few Clicks",
+    "landing_hero_subtitle": "Import your plans, automatically generate measurements, and produce professional quotes. Multi-company SaaS solution for construction professionals.",
+    "landing_cta_start": "Start for Free",
+    "landing_cta_demo": "Watch Demo",
+
+    "landing_features_title": "Everything You Need for Your Quotes",
+
+    "feature_plans_title": "Plan Import",
+    "feature_plans_desc": "Import your PDF or DWG/DXF plans. Calibrate the scale and trace areas to automatically calculate measurements.",
+
+    "feature_bpu_title": "BPU Library",
+    "feature_bpu_desc": "Country-specific, customizable price library. Manage your price ranges (Eco, Standard, Premium) with coefficients.",
+
+    "feature_quotes_title": "Professional Quotes",
+    "feature_quotes_desc": "Generate versioned quotes with PDF and Excel exports. Automatic calculation of totals (HT/VAT/TTC).",
+
+    "feature_questions_title": "Question Engine",
+    "feature_questions_desc": "Collect missing information: ceiling height, joinery, coatings, air conditioning, swimming pool...",
+
+    "feature_users_title": "Multi-User",
+    "feature_users_desc": "Manage your team with roles: Admin, Quantity Surveyor, Sales, Read-only. Granular permissions.",
+
+    "feature_countries_title": "Multi-Country",
+    "feature_countries_desc": "Multi-currency support and country-specific BPU libraries: Morocco, France, Tunisia, Algeria, Senegal, Ivory Coast.",
+
+    "landing_cta_bottom_title": "Ready to Simplify Your Quotes?",
+    "landing_cta_bottom_desc": "Join hundreds of professionals using DevisPro to save time and produce accurate quotes.",
+    "landing_cta_register_free": "Create My Free Account",
+
+    "footer_copyright": "© 2025 DevisPro. All rights reserved.",
+
+    "loading_text": "Loading...",
+    "login_required_message": "Please log in to access this page."
+}

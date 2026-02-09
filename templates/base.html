@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ current_locale }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,42 +42,42 @@
             </div>
             
             <div class="p-4 border-b">
-                <p class="text-sm text-gray-500">Entreprise</p>
+                <p class="text-sm text-gray-500">{{ t('nav_company') }}</p>
                 <p class="font-medium text-gray-800 truncate">{{ current_user.company.name }}</p>
             </div>
             
             <nav class="p-4 space-y-1">
                 <a href="{{ url_for('main.dashboard') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
                     <i class="fas fa-tachometer-alt w-5"></i>
-                    <span>Tableau de bord</span>
+                    <span>{{ t('nav_dashboard') }}</span>
                 </a>
                 <a href="{{ url_for('projects.index') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition {% if 'projects' in request.endpoint %}active{% endif %}">
                     <i class="fas fa-project-diagram w-5"></i>
-                    <span>Projets</span>
+                    <span>{{ t('nav_projects') }}</span>
                 </a>
                 <a href="{{ url_for('quotes.index') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition {% if 'quotes' in request.endpoint %}active{% endif %}">
                     <i class="fas fa-file-invoice-dollar w-5"></i>
-                    <span>Devis</span>
+                    <span>{{ t('nav_quotes') }}</span>
                 </a>
                 <a href="{{ url_for('bpu.index') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition {% if 'bpu' in request.endpoint %}active{% endif %}">
                     <i class="fas fa-database w-5"></i>
-                    <span>Bibliothèque BPU</span>
+                    <span>{{ t('nav_bpu') }}</span>
                 </a>
                 
                 {% if current_user.is_company_owner or current_user.has_permission('can_manage_users') %}
                 <div class="pt-4 mt-4 border-t">
-                    <p class="px-4 text-xs text-gray-400 uppercase tracking-wider mb-2">Administration</p>
+                    <p class="px-4 text-xs text-gray-400 uppercase tracking-wider mb-2">{{ t('nav_admin_section') }}</p>
                     <a href="{{ url_for('admin.index') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition {% if request.endpoint == 'admin.index' %}active{% endif %}">
                         <i class="fas fa-users w-5"></i>
-                        <span>Utilisateurs</span>
+                        <span>{{ t('nav_users') }}</span>
                     </a>
                     <a href="{{ url_for('admin.settings') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition {% if request.endpoint == 'admin.settings' %}active{% endif %}">
                         <i class="fas fa-cog w-5"></i>
-                        <span>Paramètres</span>
+                        <span>{{ t('nav_settings') }}</span>
                     </a>
                     <a href="{{ url_for('admin.audit_log') }}" class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition {% if request.endpoint == 'admin.audit_log' %}active{% endif %}">
                         <i class="fas fa-history w-5"></i>
-                        <span>Journal d'audit</span>
+                        <span>{{ t('nav_audit_log') }}</span>
                     </a>
                 </div>
                 {% endif %}
@@ -103,12 +103,24 @@
                             <i class="fas fa-chevron-down text-xs" aria-hidden="true"></i>
                         </button>
                         <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 ring-1 ring-black ring-opacity-5 focus:outline-none" aria-labelledby="user-menu-button">
+                            <div class="px-4 py-2 text-xs text-gray-500 font-semibold uppercase tracking-wider bg-gray-50">
+                                Language
+                            </div>
+                            <a href="{{ url_for('set_language', lang='fr') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center justify-between {% if current_locale == 'fr' %}bg-gray-50 text-primary{% endif %}">
+                                <span>Français</span>
+                                {% if current_locale == 'fr' %}<i class="fas fa-check text-xs"></i>{% endif %}
+                            </a>
+                            <a href="{{ url_for('set_language', lang='en') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center justify-between {% if current_locale == 'en' %}bg-gray-50 text-primary{% endif %}">
+                                <span>English</span>
+                                {% if current_locale == 'en' %}<i class="fas fa-check text-xs"></i>{% endif %}
+                            </a>
+                            <hr class="my-2">
                             <a href="{{ url_for('admin.settings') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-cog mr-2" aria-hidden="true"></i> Paramètres
+                                <i class="fas fa-cog mr-2" aria-hidden="true"></i> {{ t('user_menu_settings') }}
                             </a>
                             <hr class="my-2">
                             <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-red-600 hover:bg-gray-100">
-                                <i class="fas fa-sign-out-alt mr-2" aria-hidden="true"></i> Déconnexion
+                                <i class="fas fa-sign-out-alt mr-2" aria-hidden="true"></i> {{ t('user_menu_logout') }}
                             </a>
                         </div>
                     </div>

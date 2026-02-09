@@ -36,6 +36,17 @@ def create_app():
     from routes import register_blueprints
     register_blueprints(app)
     
+    from services.i18n_service import i18n
+    i18n.init_app(app)
+
+    from flask import session, redirect, request
+
+    @app.route('/set_language/<lang>')
+    def set_language(lang):
+        if lang in i18n.supported_locales:
+            session['lang'] = lang
+        return redirect(request.referrer or '/')
+
     with app.app_context():
         db.create_all()
         from scripts.seed_data import seed_initial_data

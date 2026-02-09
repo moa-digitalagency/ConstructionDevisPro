@@ -1,0 +1,55 @@
+{
+    "app_name": "DevisPro",
+    "meta_title": "DevisPro - Solution SaaS de Devis pour le Bâtiment",
+    "page_title_dashboard": "Tableau de bord",
+    "page_title_home": "Accueil",
+
+    "nav_dashboard": "Tableau de bord",
+    "nav_projects": "Projets",
+    "nav_quotes": "Devis",
+    "nav_bpu": "Bibliothèque BPU",
+    "nav_admin_section": "Administration",
+    "nav_users": "Utilisateurs",
+    "nav_settings": "Paramètres",
+    "nav_audit_log": "Journal d'audit",
+    "nav_company": "Entreprise",
+
+    "user_menu_settings": "Paramètres",
+    "user_menu_logout": "Déconnexion",
+    "nav_login": "Connexion",
+    "nav_register": "Créer un compte",
+
+    "landing_hero_title": "Créez vos devis de construction en quelques clics",
+    "landing_hero_subtitle": "Importez vos plans, générez automatiquement les métrés et produisez des devis professionnels. Solution SaaS multi-entreprises pour les professionnels du bâtiment.",
+    "landing_cta_start": "Commencer gratuitement",
+    "landing_cta_demo": "Voir la démo",
+
+    "landing_features_title": "Tout ce dont vous avez besoin pour vos devis",
+
+    "feature_plans_title": "Import de plans",
+    "feature_plans_desc": "Importez vos plans PDF ou DWG/DXF. Calibrez l'échelle et tracez les surfaces pour calculer automatiquement les métrés.",
+
+    "feature_bpu_title": "Bibliothèque BPU",
+    "feature_bpu_desc": "Bibliothèque de prix par pays, personnalisable. Gérez vos gammes de prix (Éco, Standard, Premium) avec coefficients.",
+
+    "feature_quotes_title": "Devis professionnels",
+    "feature_quotes_desc": "Générez des devis versionnés avec exports PDF et Excel. Calcul automatique des totaux HT/TVA/TTC.",
+
+    "feature_questions_title": "Moteur de questions",
+    "feature_questions_desc": "Collectez les informations manquantes: hauteur sous plafond, menuiseries, revêtements, climatisation, piscine...",
+
+    "feature_users_title": "Multi-utilisateurs",
+    "feature_users_desc": "Gérez votre équipe avec des rôles: Admin, Métreur, Commercial, Lecture seule. Permissions granulaires.",
+
+    "feature_countries_title": "Multi-pays",
+    "feature_countries_desc": "Support multi-devises et bibliothèques BPU par pays: Maroc, France, Tunisie, Algérie, Sénégal, Côte d'Ivoire.",
+
+    "landing_cta_bottom_title": "Prêt à simplifier vos devis ?",
+    "landing_cta_bottom_desc": "Rejoignez des centaines de professionnels qui utilisent DevisPro pour gagner du temps et produire des devis précis.",
+    "landing_cta_register_free": "Créer mon compte gratuitement",
+
+    "footer_copyright": "© 2025 DevisPro. Tous droits réservés.",
+
+    "loading_text": "Chargement...",
+    "login_required_message": "Veuillez vous connecter pour accéder à cette page."
+}
