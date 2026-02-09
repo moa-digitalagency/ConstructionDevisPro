@@ -1,5 +1,5 @@
 import os
-from models import db, Role, BPULibrary, BPUArticle, QuestionTemplate, Company, User, UserRole
+from models import db, Role, BPULibrary, BPUArticle, QuestionTemplate, Company, User, UserRole, PricingTier
 from datetime import date
 
 
@@ -46,6 +46,16 @@ def seed_demo_superadmin():
     
     user_role = UserRole(user_id=user.id, role_id=owner_role.id)
     db.session.add(user_role)
+
+    # Create default pricing tiers for the demo company
+    tiers = [
+        PricingTier(company_id=company.id, name='Économique', code='ECO', coefficient=0.85, is_default=False, sort_order=1),
+        PricingTier(company_id=company.id, name='Standard', code='STD', coefficient=1.00, is_default=True, sort_order=2),
+        PricingTier(company_id=company.id, name='Premium', code='PREM', coefficient=1.25, is_default=False, sort_order=3),
+    ]
+    for tier in tiers:
+        db.session.add(tier)
+
     db.session.commit()
 
 
