@@ -8,6 +8,23 @@ def seed_initial_data():
     seed_bpu_library()
     seed_question_templates()
     seed_demo_superadmin()
+    fix_existing_companies_tiers()
+
+
+def fix_existing_companies_tiers():
+    """Ensure all companies have pricing tiers."""
+    companies = Company.query.all()
+    for company in companies:
+        if PricingTier.query.filter_by(company_id=company.id).count() == 0:
+            print(f"Adding default pricing tiers for company: {company.name}")
+            tiers = [
+                PricingTier(company_id=company.id, name='Économique', code='ECO', coefficient=0.85, is_default=False, sort_order=1),
+                PricingTier(company_id=company.id, name='Standard', code='STD', coefficient=1.00, is_default=True, sort_order=2),
+                PricingTier(company_id=company.id, name='Premium', code='PREM', coefficient=1.25, is_default=False, sort_order=3),
+            ]
+            for tier in tiers:
+                db.session.add(tier)
+            db.session.commit()
 
 
 def seed_demo_superadmin():
