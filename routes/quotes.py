@@ -65,6 +65,9 @@ def new(project_id):
         flash('Devis créé avec succès!', 'success')
         return redirect(url_for('quotes.view', quote_id=quote.id))
     
+    # Ensure tiers exist before rendering to avoid empty dropdown
+    current_user.company.ensure_default_tiers()
+
     return render_template('quotes/new.html',
         project=project,
         tiers=current_user.company.pricing_tiers.all()
