@@ -22,7 +22,7 @@ class Company(db.Model, TimestampMixin):
     bpu_overrides = db.relationship('CompanyBPUOverride', back_populates='company', lazy='dynamic', cascade='all, delete-orphan')
     custom_articles = db.relationship('CompanyBPUArticle', back_populates='company', lazy='dynamic', cascade='all, delete-orphan')
 
-    def ensure_default_tiers(self):
+    def ensure_default_tiers(self, commit=True):
         """Creates default pricing tiers if none exist."""
         if self.pricing_tiers.count() > 0:
             return
@@ -35,7 +35,9 @@ class Company(db.Model, TimestampMixin):
         ]
         for tier in tiers:
             db.session.add(tier)
-        db.session.commit()
+
+        if commit:
+            db.session.commit()
 
     def __repr__(self):
         return f'<Company {self.name}>'
