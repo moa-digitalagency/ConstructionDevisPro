@@ -17,14 +17,7 @@ def fix_existing_companies_tiers():
     for company in companies:
         if PricingTier.query.filter_by(company_id=company.id).count() == 0:
             print(f"Adding default pricing tiers for company: {company.name}")
-            tiers = [
-                PricingTier(company_id=company.id, name='Économique', code='ECO', coefficient=0.85, is_default=False, sort_order=1),
-                PricingTier(company_id=company.id, name='Standard', code='STD', coefficient=1.00, is_default=True, sort_order=2),
-                PricingTier(company_id=company.id, name='Premium', code='PREM', coefficient=1.25, is_default=False, sort_order=3),
-            ]
-            for tier in tiers:
-                db.session.add(tier)
-            db.session.commit()
+            company.ensure_default_tiers()
 
 
 def seed_demo_superadmin():
@@ -65,13 +58,7 @@ def seed_demo_superadmin():
     db.session.add(user_role)
 
     # Create default pricing tiers for the demo company
-    tiers = [
-        PricingTier(company_id=company.id, name='Économique', code='ECO', coefficient=0.85, is_default=False, sort_order=1),
-        PricingTier(company_id=company.id, name='Standard', code='STD', coefficient=1.00, is_default=True, sort_order=2),
-        PricingTier(company_id=company.id, name='Premium', code='PREM', coefficient=1.25, is_default=False, sort_order=3),
-    ]
-    for tier in tiers:
-        db.session.add(tier)
+    company.ensure_default_tiers()
 
     db.session.commit()
 

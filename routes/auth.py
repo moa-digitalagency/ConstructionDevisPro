@@ -116,13 +116,7 @@ def register():
         tax_profile = TaxProfile(company_id=company.id)
         db.session.add(tax_profile)
         
-        tiers = [
-            PricingTier(company_id=company.id, name='Économique', code='ECO', coefficient=0.85, is_default=False, sort_order=1),
-            PricingTier(company_id=company.id, name='Standard', code='STD', coefficient=1.00, is_default=True, sort_order=2),
-            PricingTier(company_id=company.id, name='Premium', code='PREM', coefficient=1.25, is_default=False, sort_order=3),
-        ]
-        for tier in tiers:
-            db.session.add(tier)
+        company.ensure_default_tiers(commit=False)
         
         user = User(
             company_id=company.id,
