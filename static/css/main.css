@@ -1,0 +1,5 @@
+.sidebar-link.active {
+    background-color: rgba(26, 86, 219, 0.1);
+    border-left: 3px solid #1a56db;
+    color: #1a56db;
+}

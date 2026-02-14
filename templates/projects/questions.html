@@ -15,7 +15,7 @@
                 <p class="text-gray-500 mt-2">Répondez aux questions pour affiner le chiffrage</p>
             </div>
             
-            <form method="POST" action="{{ url_for('api.save_project_answers', project_id=project.id) if false else '#' }}" class="space-y-8" id="questions-form">
+            <form method="POST" action="{{ url_for('api.save_project_answers', project_id=project.id) if false else '#' }}" class="space-y-8" id="questions-form" data-redirect-url="{{ url_for('projects.view', project_id=project.id) }}">
                 <div class="border-l-4 border-blue-500 rounded-lg p-6 bg-gradient-to-r from-blue-50 to-white">
                     <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
                         <i class="fas fa-ruler-vertical text-blue-500 mr-2"></i>
@@ -182,21 +182,5 @@
     </div>
 </div>
 
-<script>
-function toggleClimQty(select) {
-    const container = document.getElementById('clim-qty-container');
-    container.style.display = select.value === 'aucune' ? 'none' : 'block';
-}
-
-function togglePoolOptions(select) {
-    const container = document.getElementById('pool-options');
-    container.classList.toggle('hidden', select.value === 'non');
-}
-
-document.getElementById('questions-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    alert('Réponses enregistrées! Vous pouvez maintenant générer un devis.');
-    window.location.href = '{{ url_for("projects.view", project_id=project.id) }}';
-});
-</script>
+<script src="{{ url_for('static', filename='js/projects/questions.js') }}"></script>
 {% endblock %}
